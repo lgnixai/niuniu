@@ -44,22 +44,7 @@ class CoreOrderService extends BaseApiService
         $this->deliveryModel = new OrderDelivery();
         $this->payModel = new FengChaoPay();
     }
-    public function create_no(string $prefix = '', string $tag = '')
-    {
 
-        $data_center_id = 1;
-        $machine_id = 2;
-        $snowflake = new Snowflake($data_center_id, $machine_id);
-        $id = $snowflake->generateId();
-        $no = $prefix . date('Ymd') . $tag . $id;
-        $cacheKey = 'unique_no_' . $no;
-        if (Cache::get($cacheKey)) {
-            return create_no($prefix, $tag);
-        } else {
-            Cache::set($cacheKey, true, 60); // 设置过期时间为 60 秒
-            return $no;
-        }
-    }
 
     public function checkBalance($params)
     {
@@ -100,11 +85,12 @@ class CoreOrderService extends BaseApiService
             $order = [
                 "site_id" => $this->site_id,
                 'ip' => request()->ip() ?? '',
-                "order_id" => $this->create_no(),
+                "order_id" => $data["result"]["OrderCode"],
             ];
             $this->model->save($order);
 
             $order_delivery = [
+                "site_id" => $this->site_id,
                 "order_id" => $order["order_id"],
                 "line_price_id" => $linePrice["id"],
                 "client_order_code" => $data["OrderCode"],

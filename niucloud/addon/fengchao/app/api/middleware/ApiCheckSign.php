@@ -36,7 +36,6 @@ class ApiCheckSign
             [ "RequestData", "" ],
             [ "DataType", 2 ],
             [ "DataSign", "" ]
-
         ]);
 
         $auth=(new SiteAuthService())->getByAppKey($data["EBusinessID"]);

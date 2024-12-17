@@ -11,13 +11,31 @@ use addon\fengchao\app\service\api\order\OrderPrice;
 use addon\fengchao\app\service\core\CoreOrderService;
 use app\dict\pay\PayDict;
 use core\base\BaseApiController;
-use think\facade\Log;
+ use core\util\Snowflake;
+ use think\facade\Cache;
+ use think\facade\Log;
 use think\Response;
 
 
 class Express extends BaseApiController
 {
 
+    public function create_no(string $prefix = '', string $tag = '')
+    {
+
+        $data_center_id = 1;
+        $machine_id = 2;
+        $snowflake = new Snowflake($data_center_id, $machine_id);
+        $id = $snowflake->generateId();
+        $no = $prefix . date('Ymd') . $tag . $id;
+        $cacheKey = 'unique_no_' . $no;
+        if (Cache::get($cacheKey)) {
+            return create_no($prefix, $tag);
+        } else {
+            Cache::set($cacheKey, true, 60); // 设置过期时间为 60 秒
+            return $no;
+        }
+    }
     //快递鸟接口
     public function  order()
     {
@@ -32,9 +50,12 @@ class Express extends BaseApiController
             ["RequestData", ""],
             ["RequestType", ""],
             ["EBusinessID", ""],
+            ["DataSign", ""],
+            ["DataType", ""],
             ["ApiKey", ""],
             ["callback_url", ""],
         ]);
+        $this->validate($data, 'addon\fengchao\app\validate\express\Order.auth');
 
 
         $requestData = $data['RequestData'];
@@ -55,25 +76,34 @@ class Express extends BaseApiController
         switch ($data['RequestType']){
             case "1801":
 
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
 
                 $res=(new CoreOrderService())->checkBalance($res_data);
                 if($res){
+                    $temp_order=$res_data;
+                    $temp_order["OrderCode"]=$this->create_no();
+                    $datas['RequestData']=json_encode($temp_order,JSON_UNESCAPED_UNICODE);
                     $result = (new ExpressService())->Kdniao($datas);
                     if($result["Success"]){
                         $res_data["result"]= $result["Order"];
                         $res=(new CoreOrderService())->createOrder($res_data);
                         event('AfterOrderCreate', ($result));
                     }
+                    $result["Reason"]="平台已接单";
                     $event_data["response"]=$result;
                     Log::write('快递鸟下单接口' . json_encode($result));
                 }
                 break;
             case "1815":
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1815');
+
                 $res=(new CoreOrderService())->preOrder($res_data);
                 $result=[];
+                $result["EBusinessID"]=$data['EBusinessID'];
                 $result["Data"]=$res;
                 $result["ResultCode"]="100";
                 $result["Reason"]="查询成功！";
+                $result["Success"]=true;
                 break;
             default:
                 $result = (new ExpressService())->Kdniao($datas);
@@ -84,12 +114,8 @@ class Express extends BaseApiController
 
         //添加日志
         OrderEventService::createOrderLog($event_data);
-        $result["msg"]="";
+
         return json($result);
-//        if ($result["Success"] == false) {
-//            return success($msg = 'FAIL', json_encode($result),0);
-//        }
-//        return success($msg = 'SUCCESS', json_encode($result));
 
     }
     /**

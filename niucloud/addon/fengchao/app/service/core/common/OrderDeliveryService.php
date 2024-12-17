@@ -24,7 +24,7 @@ class OrderDeliveryService extends BaseApiService
     public function getOrderIdByClient($order_id)
     {
 
-        $info = $this->model->where([['client_order_code', '=', $order_id]])->findOrEmpty()->toArray();
+        $info = $this->model->where([["site_id","=",$this->site_id],['client_order_code', '=', $order_id]])->findOrEmpty()->toArray();
         if (empty($info))
             throw new CommonException('获取客户订单号失败');
 

@@ -11,9 +11,12 @@
 
 namespace addon\fengchao\app\service\api\express;
 
+use addon\fengchao\app\service\core\common\OrderDeliveryService;
 use addon\fengchao\app\service\core\order\CoreOrderConfigService;
+use addon\fengchao\app\service\core\order\OrderService;
 use core\base\BaseAdminService;
 use core\base\BaseApiService;
+use think\facade\Log;
 use function Symfony\Component\Translation\t;
 
 
@@ -36,10 +39,13 @@ class ExpressService extends BaseApiService
         $AppKey = env("fengchao.KDN_KEY");
         $ReqURL = env("fengchao.KDN_URL");
         $request_data=json_decode($data["RequestData"],true);
-        if (isset($request_data["OrderCode"])) {
-            $request_data["OrderCode"]=$data["SiteId"]."_".$request_data["OrderCode"];
+        // 处理客户订单号
+        if (isset($request_data["OrderCode"])&&$data["RequestType"]!="1801") {
+            $order=(new OrderDeliveryService())->getOrderIdByClient($request_data['OrderCode']);
+
+            $request_data["OrderCode"]=$order;
         }
-        //var_dump( $request_data );
+
         $request_data= json_encode($request_data,JSON_UNESCAPED_UNICODE);
 
 // 组装系统级参数
@@ -51,41 +57,34 @@ class ExpressService extends BaseApiService
         );
         $datas['DataSign'] = $this->encrypt($request_data, $AppKey);
 
+
+        Log::write("向快递鸟下单的数据---".$request_data.'---'.date("Y-m-d H:i:s").'------');
+
         //以form表单形式提交post请求，post请求体中包含了应用级参数和系统级参数
         $result = $this->sendPost($ReqURL, $datas);
         $result=json_decode($result,true);
 
+        if($datas["RequestType"]!="1801"){
+            if(isset($result['OrderCode'])){
+                $order=(new OrderDeliveryService())->getOrderIdByClient($result['OrderCode']);
+                if(isset($order)){
+                    $result['OrderCode']=$order["order_id"];
 
-        if(isset($result['OrderCode'])){
-            $result['OrderCode']=str_replace($data["SiteId"]."_","",$result['OrderCode']);
-         }
-        if(isset($result["Order"]["OrderCode"])){
-            $result["Order"]["OrderCode"]=str_replace($data["SiteId"]."_","",$result["Order"]["OrderCode"]);
+                }else{
+                    throw new \Exception("订单不存在");
+                }
+            }
+            if(isset($result["Order"]["OrderCode"])){
+                $order=(new OrderDeliveryService())->getOrderIdByClient( $result["Order"]["OrderCode"]);
+                if(isset($order)){
+                    $result["Order"]["OrderCode"]=$order["order_id"];
+
+                }else{
+                    throw new \Exception("订单不存在");
+                }
+
+            }
         }
-
-        return  $result;
-    }
-
-    public function KdniaoDev($data)
-    {
-
-
-
-        // 组装系统级参数
-        $datas = array(
-            'EBusinessID' => $EBusinessID,
-            'RequestType' => $data["RequestData"],
-            'RequestData' => urlencode($data["RequestData"]),
-            'DataType' => '2',
-        );
-        $datas['DataSign'] = $this->encrypt($data["RequestData"], $AppKey);
-        //以form表单形式提交post请求，post请求体中包含了应用级参数和系统级参数
-
-        $result = $this->sendPost($ReqURL, $datas);
-       // $result=json_decode($result,true);
-        //echo $result['OrderCode'];
-        var_dump($result);
-
         return  $result;
     }
 

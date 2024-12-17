@@ -81,7 +81,7 @@ class FakeData extends BaseApiController
             "ShipperType" => 5, // 随机快递类型
             "ShipperCode" => $faker->randomElement(["YD", "STO",  "ZTO","YTO","JTSD"]), // 快递公司编码
             "OrderCode" => $faker->uuid, // 商家订单编号
-            "ExpType" => $faker->numberBetween(1, 5), // 快递类型
+            "ExpType" => 1, // 快递类型
             "PayType" => 3, // 支付方式
 
             "Receiver" => [
