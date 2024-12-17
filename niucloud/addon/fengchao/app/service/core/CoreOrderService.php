@@ -46,6 +46,10 @@ class CoreOrderService extends BaseApiService
     }
 
 
+    public function ChangeAppId($params){
+        $params["EBusinessID"]=$this->member_id;
+        return $params;
+    }
     public function checkBalance($params)
     {
         $balance = (new BalanceService())->getInfo();
@@ -91,6 +95,7 @@ class CoreOrderService extends BaseApiService
 
             $order_delivery = [
                 "site_id" => $this->site_id,
+                "app_id" => $this->member_id,
                 "order_id" => $order["order_id"],
                 "line_price_id" => $linePrice["id"],
                 "client_order_code" => $data["OrderCode"],
@@ -128,7 +133,8 @@ class CoreOrderService extends BaseApiService
     {
 
         Log::write("回调---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
-        $order_id=(new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+        $order_id=$data["OrderCode"];
+        $client_id= (new OrderDeliveryService())->getClientIdById($data["OrderCode"]);
         $server_order_id=$data["KDNOrderCode"];
 
         $state=$data["State"];
@@ -208,7 +214,8 @@ class CoreOrderService extends BaseApiService
     {
 
         Log::write("回调---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
-        $order_id=(new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+        $order_id=$data["OrderCode"];
+        $client_id= (new OrderDeliveryService())->getClientIdById($data["OrderCode"]);
 
         $server_order_id=$data["KDNOrderCode"];
         $state=$data["State"];
@@ -266,7 +273,9 @@ class CoreOrderService extends BaseApiService
     {
 
         Log::write("回调处理---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
-        $order_id=(new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+
+        $order_id=$data["OrderCode"];
+        $client_id= (new OrderDeliveryService())->getClientIdById($data["OrderCode"]);
         $server_order_id=$data["KDNOrderCode"];
         $state=$data["State"];
 
@@ -296,6 +305,11 @@ class CoreOrderService extends BaseApiService
                 "server_data"=>$data,
             ];
             (new OrderCallBackLogService())->add($order);
+
+            $data["OrderCode"]=$client_id;
+            $data["FCOrderCode"]=$order_id;
+            event('SendNotify',$data );
+
             Db::commit();
             return true;
         } catch (Exception $e) {

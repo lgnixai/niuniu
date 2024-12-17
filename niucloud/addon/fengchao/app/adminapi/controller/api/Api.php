@@ -18,6 +18,8 @@ use app\service\api\sys\ConfigService;
 use core\base\BaseAdminController;
 use addon\fengchao\app\service\admin\delivery\CompanyService;
 use addon\fengchao\app\service\core\delivery\CoreCompanyService;
+use core\util\Snowflake;
+use think\facade\Cache;
 use think\facade\Request;
 use think\facade\Db;
 use Defuse\Crypto\Crypto;
@@ -37,27 +39,28 @@ class Api extends BaseAdminController
         return success((new SiteApiService())->getList());
 
     }
+    public function create_no(string $prefix = '', string $tag = '')
+    {
 
+        $data_center_id = 1;
+        $machine_id = 2;
+        $snowflake = new Snowflake($data_center_id, $machine_id);
+        $id = $snowflake->generateId();
+        $no = $prefix . date('Ymd') . $tag . $id;
+        $cacheKey = 'unique_no_' . $no;
+        if (Cache::get($cacheKey)) {
+            return create_no($prefix, $tag);
+        } else {
+            Cache::set($cacheKey, true, 60); // 设置过期时间为 60 秒
+            return $no;
+        }
+    }
     public function createNewApi()
     {
 
-
         // 生成 apikey
-        $apikey = bin2hex(random_bytes(16));
-
-        // 生成 apisecret
-        $apisecret = bin2hex(random_bytes(32));
-
-        // $encrypted_key = Crypto::encrypt($apikey, Key::loadFromAsciiSafeString($encryption_key));
-
-        // $encrypted_secret = Crypto::encrypt($apisecret, Key::loadFromAsciiSafeString($encryption_key));
-
-        $data = [
-            'api_key' => $apikey,
-            'api_secret' => $apisecret,
-        ];
         //这里需要返回一个json
-
+        $data = (new SiteApiService())->getUid();
         return success($data);
 
     }

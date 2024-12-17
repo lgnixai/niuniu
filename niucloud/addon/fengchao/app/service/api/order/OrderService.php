@@ -66,7 +66,7 @@ class OrderService extends BaseApiService
         $search_model=(new FengChaoOrder())
             ->alias('o')
             ->join('fengchao_order_delivery od', 'o.order_id = od.order_id')
-            ->where([ [ 'site_id', '=', $this->site_id ] ])
+            ->where([ [ 'o.site_id', '=', $this->site_id ] ])
             ->where('od.order_id|od.logistic_order_code|od.client_order_code', 'like', '%' . $where['order_code'] . '%')
             ->withSearch(['create_time' ], $where)
              ->field('o.*,od.*');

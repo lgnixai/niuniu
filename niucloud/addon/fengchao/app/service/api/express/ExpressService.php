@@ -41,6 +41,7 @@ class ExpressService extends BaseApiService
         $request_data=json_decode($data["RequestData"],true);
         // 处理客户订单号
         if (isset($request_data["OrderCode"])&&$data["RequestType"]!="1801") {
+
             $order=(new OrderDeliveryService())->getOrderIdByClient($request_data['OrderCode']);
 
             $request_data["OrderCode"]=$order;
@@ -64,20 +65,23 @@ class ExpressService extends BaseApiService
         $result = $this->sendPost($ReqURL, $datas);
         $result=json_decode($result,true);
 
+
+
         if($datas["RequestType"]!="1801"){
             if(isset($result['OrderCode'])){
-                $order=(new OrderDeliveryService())->getOrderIdByClient($result['OrderCode']);
-                if(isset($order)){
-                    $result['OrderCode']=$order["order_id"];
+                $clientId=(new OrderDeliveryService())->getClientIdById($result['OrderCode']);
 
+                if(isset($order)){
+                    $result['OrderCode']=$clientId;
                 }else{
                     throw new \Exception("订单不存在");
                 }
+
             }
             if(isset($result["Order"]["OrderCode"])){
-                $order=(new OrderDeliveryService())->getOrderIdByClient( $result["Order"]["OrderCode"]);
+                $order=(new OrderDeliveryService())->getClientIdById( $result["Order"]["OrderCode"]);
                 if(isset($order)){
-                    $result["Order"]["OrderCode"]=$order["order_id"];
+                    $result["Order"]["OrderCode"]=$clientId;
 
                 }else{
                     throw new \Exception("订单不存在");

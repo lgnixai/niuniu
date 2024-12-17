@@ -58,6 +58,27 @@ class SiteApiService extends BaseAdminService
 
         return $res->id;
     }
+    public function getUid( )
+    {
+        $apikey = $this->site_id.bin2hex(random_int(100,200));
+
+        // 生成 apisecret
+        $apisecret = bin2hex(random_bytes(32));
+
+        // $encrypted_key = Crypto::encrypt($apikey, Key::loadFromAsciiSafeString($encryption_key));
+
+        // $encrypted_secret = Crypto::encrypt($apisecret, Key::loadFromAsciiSafeString($encryption_key));
+
+        $data = [
+            'api_key' => $apikey,
+            'api_secret' => $apisecret,
+        ];
+
+
+
+
+        return $data;
+    }
 
     public function del(int $id)
     {

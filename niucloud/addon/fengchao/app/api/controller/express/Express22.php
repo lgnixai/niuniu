@@ -17,7 +17,7 @@ use core\base\BaseApiController;
 use think\Response;
 
 
-class Express extends BaseApiController
+class Express22 extends BaseApiController
 {
 
     public function create_no(string $prefix = '', string $tag = '')
@@ -114,7 +114,6 @@ class Express extends BaseApiController
 
         //添加日志
         OrderEventService::createOrderLog($event_data);
-        $result=(new CoreOrderService())->ChangeAppId($result);
 
         return json($result);
 
@@ -142,15 +141,14 @@ class Express extends BaseApiController
         $res["ResultCode"] = 100;
         $res["Reason"] = "成功";
         $res["UpdateTime"] = date('Y-m-d H:i:s');
-
         echo json_encode($res);
         flush(); // 确保响应输出到客户端
+
+
         // 继续后台操作
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
-
-
         $data=json_decode($data['RequestData'], true);;
         $res_data =  $data["Data"][0];
         Log::write('订单回调完成' . json_encode($res_data));
@@ -164,25 +162,22 @@ class Express extends BaseApiController
             case "208":
             case "601":
                 //最终确认费用
-                $res1=(new CoreOrderService())->ConfirmOrder($res_data);
+                $res=(new CoreOrderService())->ConfirmOrder($res_data);
                 break;
             //订单完成
             case "203":
             case "206":
             case "99":
                 //订单取消 调度失败
-                $res1=(new CoreOrderService())->CancelOrder($res_data);
-
+                $res=(new CoreOrderService())->CancelOrder($res_data);
                 break;
             default:
-
 
                 break;
         }
 
-        $result=(new CoreOrderService())->ChangeAppId($res_data);
-        (new CoreOrderService())->NotifyOrder($result);
 
+        (new CoreOrderService())->NotifyOrder($res_data);
         Log::write('订单回调完成' . json_encode($data,JSON_UNESCAPED_UNICODE));
 
 

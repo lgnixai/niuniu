@@ -62,18 +62,18 @@ const formRules = computed(() => {
             { required: true, message: t('apiNamePlaceholder'), trigger: 'blur' }
         ],
         callback_url: [
-            { required: true, message: t('urlPlaceholder'), trigger: 'blur' },
-            {
-                validator: (rule, value, callback) => {
-                    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
-                    if (value && !urlPattern.test(value)) {
-                        callback(new Error(t('urlFormatError')))
-                    } else {
-                        callback()
-                    }
-                },
-                trigger: 'blur'
-            }
+            { required: true, message: t('urlPlaceholder'), trigger: 'blur' }
+            // {
+            //     validator: (rule, value, callback) => {
+            //         const urlPattern = /^(http?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
+            //         if (value && !urlPattern.test(value)) {
+            //             callback(new Error(t('urlFormatError')))
+            //         } else {
+            //             callback()
+            //         }
+            //     },
+            //     trigger: 'blur'
+            // }
         ]
     }
 })

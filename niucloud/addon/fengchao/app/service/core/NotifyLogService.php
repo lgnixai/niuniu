@@ -9,8 +9,10 @@
 // | Author: Niucloud Team
 // +----------------------------------------------------------------------
 
-namespace addon\fengchao\app\service\admin\site;
+namespace addon\fengchao\app\service\core;
 
+use addon\fengchao\app\model\order\NotifyLog;
+use addon\fengchao\app\model\order\OrderLog;
 use addon\fengchao\app\model\site\SiteAccount;
 use addon\fengchao\app\model\site\SiteAuth;
 use addon\fengchao\app\model\site\SiteBalanceLog;
@@ -27,16 +29,16 @@ use Defuse\Crypto\Key;
 use think\facade\Db;
 
 /**
- * 会员账户流水服务层（会员个人账户通过会员服务层查询）
+ *
  * Class MemberAccountService
  * @package app\service\admin\member
  */
-class SiteAuthService extends BaseAdminService
+class NotifyLogService extends BaseAdminService
 {
     public function __construct()
     {
         parent::__construct();
-        $this->model = new  SiteAuth();
+        $this->model = new  NotifyLog();
     }
 
   public function add(array $data)
@@ -44,46 +46,9 @@ class SiteAuthService extends BaseAdminService
 
         $data['create_time'] = time();
         $res = $this->model->create($data);
-
-
         return $res->id;
     }
 
-    public function getAllList(array $where = [], $field = 'id,api_key,api_secret,create_time')
-    {
-
-        $site_id=10004;
-        $order = 'create_time desc';
-
-        return $this->model->where([])->field($field)->order($order)->select()->toArray();
-    }
-
-
-    public function getByAppKey( $api_key)
-    {
-        $field = 'id,site_id, api_key, api_secret,callback_url';
-
-
-        $detail = (new SiteAuth())->where([['api_key', '=', $api_key]])->field($field)->findOrEmpty()->toArray();
-
-        return $detail;
-    }
-    // 重新计算签名
-    public function verifySign($data, $api_secret) {
-       $encryption_key = env("fengchao.encryption_key");
-
-       $api_secret = Crypto::decrypt($api_secret, Key::loadFromAsciiSafeString($encryption_key));
-
-
-
-
-        return $this->encrypt($data , $api_secret);
-    }
-
-
-    public function encrypt($data, $api_secret) {
-        return urlencode(base64_encode(md5($data.$api_secret)));
-    }
 
 
 }

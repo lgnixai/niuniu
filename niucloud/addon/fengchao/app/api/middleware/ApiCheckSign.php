@@ -55,6 +55,7 @@ class ApiCheckSign
 
 
         $request->siteId($auth["site_id"]);
+        $request->memberId($data["EBusinessID"]);
 
         return $next($request);
     }
