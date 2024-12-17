@@ -56,26 +56,44 @@ class OrderService extends BaseApiService
     {
         $order = 'create_time desc';
         $field = 'id,order_id,order_money,order_status';
-        $search_model= ( new FengChaoOrder() )->where([
-            [ 'site_id', '=', $this->site_id ],
+//        $search_model= ( new FengChaoOrder() )->where([
+//            [ 'site_id', '=', $this->site_id ],
+//
+//        ])->with(['deliveryInfo'])->field($field)->append([ 'type_name' ]) ->order($order);
+////
+////
+///
+        $search_model=(new FengChaoOrder())
+            ->alias('o')
+            ->join('fengchao_order_delivery od', 'o.order_id = od.order_id')
+            ->where([ [ 'site_id', '=', $this->site_id ] ])
+            ->where('od.order_id|od.logistic_order_code|od.client_order_code', 'like', '%' . $where['order_code'] . '%')
+            ->withSearch(['create_time' ], $where)
+             ->field('o.*,od.*');
 
-        ])->with(['deliveryInfo'])->field($field)->append([ 'type_name' ]) ->order($order);
-//
-//
 //        $search_model = $this->model
 //            ->where([ [ 'site_id', '=', $this->site_id ] ])
-//            ->with(
+//             ->with(
 //                [
-//                    'deliveryInfo' => function ($query) {
-//                        $query->field('client_order_code,logistic_order_code,weight,total_fee');
+//                    'deliveryInfo' => function ($query)use ($where) {
+//                        $query->where('order_id|logistic_order_code|client_order_code', 'like', '%' . $where['order_code'] . '%')->
+//                            field('client_order_code,logistic_order_code,weight,total_fee');
 //                    },
 //                ]
 //            )
-//            //->withSearch(['order_id'  ], $where)
+//             ->withSearch([ 'create_time' ], $where)
 //            ->order($order);
-//
+
 
         $list = $this->pageQuery($search_model);
+
+        foreach ($list['data'] as $key => $item) {
+            if (isset($item['order_info'])) {
+
+                $list['data'][$key]['order_info']  = json_decode($item['order_info'], true);
+            }
+        }
+
         return $list;
     }
 

@@ -61,4 +61,25 @@ class FengChaoOrder extends BaseModel
     {
         return $this->hasOne(OrderDelivery::class, 'order_id', 'order_id');
     }
+
+    public function searchOrderCodeAttr($query, $value, $data)
+    {
+        $query->where(function ($q) use ($value) {
+            $q->where('order_id|logistic_order_code|client_order_code', 'like', '%' . $value . '%');
+
+        });
+    }
+
+    public function searchCreateTimeAttr($query, $value, $data)
+    {
+        $start_time = empty($value[0]) ? 0 : strtotime($value[0]);
+        $end_time = empty($value[1]) ? 0 : strtotime($value[1]);
+        if ($start_time > 0 && $end_time > 0) {
+            $query->whereBetweenTime('o.create_time', $start_time, $end_time);
+        } else if ($start_time > 0 && $end_time == 0) {
+            $query->where([['o.create_time', '>=', $start_time]]);
+        } else if ($start_time == 0 && $end_time > 0) {
+            $query->where([['o.create_time', '<=', $end_time]]);
+        }
+    }
 }

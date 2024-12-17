@@ -4,8 +4,7 @@
         <!-- 分组 -->
         <div class="group-wrap w-[180px] p-[15px] h-full border-r border-color flex flex-col">
 
-            <el-input v-model="categoryParam.name" class="m-0" :placeholder="t('upload.attachmentCategoryPlaceholder')" clearable prefix-icon="Search" @input="getAttachmentCategoryList()" />
-            <div class="group-list flex-1 my-[10px] h-0">
+             <div class="group-list flex-1 my-[10px] h-0">
                 <el-scrollbar>
                     <div class="group-item p-[10px] leading-none text-xs rounded cursor-pointer" :class="{ active: brandParam.express_no == 0 }" @click="brandParam.express_no = 0">
                         {{ t('selectPlaceholder') }}
@@ -36,16 +35,19 @@
 <!--                    <el-input v-model="brandParam.real_name" class="m-0 !w-[200px]" clearable :placeholder="t('upload.placeholder' + type + 'Name')" prefix-icon="Search" @input="getAttachmentList()" />-->
 <!--                </el-col>-->
             </el-row>
-            <div class="flex-1 my-[15px] h-0" v-loading="priceTable.loading">
+            <div class=" " v-loading="priceTable.loading">
 
-                  <div class="mt-[10px] .ve-table .ve-table-container">
+                  <div class="mt-[10px]  ">
+                    <el-scrollbar height="500px"  >
+
                     <VisualGrid ref="visualGrid" :options="gridConfig" />
+                    </el-scrollbar>
                   </div>
+                  <el-row :gutter="20">
+                    计录条数{{priceTable.total}}
+                  </el-row>
 
             </div>
-            <el-row :gutter="20">
-              计录条数{{priceTable.total}}
-            </el-row>
 
           <price-view ref="priceViewDialog" @complete="loadOrderList" />
           <import-price ref="importPriceDialog"   />

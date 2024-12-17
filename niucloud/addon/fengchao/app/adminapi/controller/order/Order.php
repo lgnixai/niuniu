@@ -16,7 +16,7 @@ class Order extends BaseAdminController
     public function lists()
     {
         $data = $this->request->params([
-            [ 'order_id', '' ],
+            [ 'order_code', '' ],
             [ 'create_time', [] ],
         ]);
 

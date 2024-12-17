@@ -78,14 +78,12 @@
           <el-table-column :label="t('operation')" min-width="210" align="right" fixed="right">
             <template #default="{ row }">
 
-              <el-button type="primary" class="mt-[5px] !ml-[0]" link @click="viewEvent(row)">{{
-                  t('viewPrice')
-                }}
+              <el-button type="primary" class="mt-[5px] !ml-[0]" link @click="viewEvent(row)">价格管理
               </el-button>
-              <el-button type="primary" class="mt-[5px] !ml-[0]" link @click="editEvent(row)">{{
-                  t('editPrice')
-                }}
-              </el-button>
+<!--              <el-button type="primary" class="mt-[5px] !ml-[0]" link @click="editEvent(row)">{{-->
+<!--                  t('editPrice')-->
+<!--                }}-->
+<!--              </el-button>-->
 
               <el-button type="primary" class="mt-[5px] !ml-[0]" link @click="adjustBalance(row)">{{
                   t('adjustPrice')
@@ -243,10 +241,6 @@ const infoEvent = (data: any) => {
  * @param data
  */
 
-const editEvent = (data: any) => {
-    router.push('/fengchao/site/price/template_edit?site_id=' + data.site_id)
-}
-
 const viewEvent = (data: any) => {
     router.push('/fengchao/site/price/view?site_id=' + data.site_id)
 }
@@ -259,69 +253,7 @@ const adjustBalance = (data: any) => {
     balanceDialog.value.setFormData(data)
     balanceDialog.value.showDialog = true
 }
-/**
- * 站点登录
- * @param siteId
- */
-const toSiteLink = (siteId: number = 0) => {
-    window.localStorage.setItem('site.token', getToken())
-    window.localStorage.setItem('site.comparisonTokenStorage', getToken())
-    window.localStorage.setItem('site.userinfo', JSON.stringify(useUserStore().userInfo))
-    if (siteId) {
-        const userinfo = useUserStore().userInfo
-        if (userinfo.is_super_admin != undefined && !userinfo.is_super_admin) {
-            const siteIds = userinfo.site_ids || []
-            if (siteIds.indexOf(siteId) == -1) {
-                ElMessage({
-                    message: t('noPermission'),
-                    type: 'warning'
-                })
-                return
-            }
-        }
-        window.localStorage.setItem('site.siteId', siteId)
-        window.localStorage.setItem('site.comparisonSiteIdStorage', siteId)
-        window.open(`${location.origin}/site/`)
-    } else {
-        window.open(`${location.origin}/home/index`)
-    }
-}
 
-const openClose = (i, site_id) => {
-    if (i == 1) {
-        ElMessageBox.confirm(t('closeSiteTips'), t('warning'),
-            {
-                confirmButtonText: t('confirm'),
-                cancelButtonText: t('cancel'),
-                type: 'warning'
-            }
-        ).then(() => {
-            closeSite({ site_id }).then(res => {
-                loadSiteList()
-            })
-        })
-    }
-    if (i == 3) {
-        openSite({ site_id }).then(res => {
-            loadSiteList()
-        })
-    }
-}
-
-const deleteEvent = (data: any) => {
-    ElMessageBox.confirm(t('siteDeleteTips'), t('warning'),
-        {
-            confirmButtonText: t('confirm'),
-            cancelButtonText: t('cancel'),
-            type: 'warning'
-        }
-    ).then(() => {
-        deleteSite(data.site_id).then(res => {
-            loadSiteList()
-        }).catch(() => {
-        })
-    })
-}
 </script>
 
 <style lang="scss" scoped></style>

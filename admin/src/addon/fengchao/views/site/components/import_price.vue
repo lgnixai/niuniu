@@ -20,7 +20,9 @@
           </el-form-item>
           <el-form-item  label="上传价格" prop="deliveryPlaceholder">
             <input type="file" @change="handleFileUpload" accept=".csv" />
-            <VisualGrid ref="visualGrid" :options="gridConfig" />
+            <el-scrollbar height="400px"  >
+            <VisualGrid  class="visual-grid-container" ref="visualGrid" :options="gridConfig" />
+            </el-scrollbar>
           </el-form-item>
 
         </el-form>
@@ -115,17 +117,7 @@ const elDialogTitle = computed(() => {
 })
 
 const rows: RowData[] = []
-for (let i = 0; i < 1; i++) {
-    const data: RowData = {
-        id: String(i),
-        senderProvince: '',
-        receiveProvince: '',
-        firstWeight: '',
-        continuousWeight: '',
-        remark: ''
-    }
-    rows.push(data)
-}
+
 const gridConfig = reactive<GridOptions>({
     columns: [
         { field: 'id', headerName: 'id', resizable: true, width: 100 },
@@ -149,29 +141,25 @@ watch(() => visualGrid.value, () => {
     visualGrid.value.gridInstance.on('beforePaste', (str) => {
         const len = str.split('\n')
         // alert(len.length)
-        addRow(len.length)
+        GridaddRow(len.length)
     })
 })
 // 添加一行数据
-const addRow = (len) => {
+const GridaddRow = (len: number) => {
     // visualGrid.value.gridInstance.g()
     // visualGrid.value.gridInstance.setRows = []
     const rows: RowData[] = []
 
     if (visualGrid.value?.gridInstance) {
         for (let i = 0; i < len; i++) {
-            rows.push(
-
-                {
-                    id: String(i),
-                    senderProvince: '',
-                    receiveProvince: '',
-                    firstWeight: '',
-                    continuousWeight: '',
-                    remark: ''
-                }
-
-            )
+            rows.push({
+                id: String(i),
+                senderProvince: '',
+                receiveProvince: '',
+                firstWeight: '',
+                continuousWeight: '',
+                remark: ''
+            })
         }
         console.log()
     } else {
@@ -206,11 +194,11 @@ const confirm = async (formEl: FormInstance | undefined) => {
                 importLinePrice(formData).then(res => {
                     loading.value = false
                     emit('complete')
+                    GridaddRow(1)
+                    formData.express_no = ''
                 }).catch(() => {
                     loading.value = false
                 })
-            } else {
-
             }
         }
     })
@@ -274,13 +262,12 @@ defineExpose({
 })
 </script>
 
-<style  >
+<style scoped >
 .visual-grid-container {
-  width: 100%;
-  height: 350px;
+
+  height: 200px;
   width: 95%;
-  /* max-width: 1200px; */
-  height: 380px;
+
 }
 
 </style>

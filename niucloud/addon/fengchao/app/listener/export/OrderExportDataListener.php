@@ -12,6 +12,7 @@
 namespace addon\fengchao\app\listener\export;
 
 
+use addon\fengchao\app\model\order\FengChaoOrder;
 use addon\fengchao\app\model\order\Order;
 use addon\fengchao\app\model\order\OrderGoods;
 use think\db\Query;
@@ -28,7 +29,7 @@ class OrderExportDataListener
     {
         $data = [];
         if ($param['type'] == 'fengchao_order') {
-            $model = new Order();
+            $model = new FengChaoOrder();
             $order = 'id desc';
             //查询导出订单数据
             $search_model = $model->withSearch(["create_time"], $param['where'])
