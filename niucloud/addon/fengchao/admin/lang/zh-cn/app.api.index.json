@@ -1,0 +1,12 @@
+{
+      "apiName":"Api名称",
+      "apiNamePlaceholder": "请输入Api名称",
+      "api_key":"用户ID",
+      "api_secret":"API key",
+      "callbackUrl":"回调Url",
+      "urlPlaceholder": "请输入回调Url",
+
+      "addApi":"创建 API",
+      "apiDeleteTips":"确定要删除该数据吗？",
+      "sandbox":"接口测试"
+}

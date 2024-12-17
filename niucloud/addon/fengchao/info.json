@@ -1,0 +1,11 @@
+{
+  "title": "蜂巢物流",
+  "desc": "蜂巢物流聚合平台",
+  "key": "fengchao",
+  "version": "1.0.0",
+  "author": "leven",
+  "type": "app",
+  "support_app": "",
+  "compile": [],
+  "support_version": "0.5.3"
+}

@@ -1,0 +1,20 @@
+{
+    "orderCode":"平台订单号",
+    "detailInfo":"查看明细",
+    "orderCodePlaceholder": "输入订单号",
+    "kdnCode": "平台单号",
+    "totalFee": "总费用",
+    "weight":"重量",
+    "Cost":"基础运费",
+    "InsureAmount":"保价费",
+    "PackageFee":"包装费",
+    "OverFee":"超长超重费",
+    "OtherFee":"其它",
+
+    "TotalFee":"总费用",
+
+    "send_province":"发件省",
+    "receiver_province":"收件省",
+    "client_order_code":"用户订单号"
+
+}
