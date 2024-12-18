@@ -105,9 +105,7 @@ class Alimq extends BaseApiController
              ["body",''],
 
          ]);
-
-
-       // Log::write('订单回调' . json_encode($data,JSON_UNESCAPED_UNICODE));
+        Log::write('阿里订单回调' . json_encode($data,JSON_UNESCAPED_UNICODE));
 
         $res=[];
         $res["EBusinessID"] = env("fengchao.KDN_ID");;
@@ -117,13 +115,13 @@ class Alimq extends BaseApiController
         echo json_encode($res);
         flush(); // 确保响应输出到客户端
 
-
         // 继续后台操作
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
         $data=json_decode($data['body']['RequestData'], true);;
         $res_data =  $data["Data"][0];
+
         Log::write('订单回调完成' . json_encode($res_data));
         $state=$res_data["State"];
 
@@ -135,24 +133,24 @@ class Alimq extends BaseApiController
             case "208":
             case "601":
                 //最终确认费用
-                $res=(new CoreOrderService())->ConfirmOrder($res_data);
+                $res1=(new CoreOrderService())->ConfirmOrder($res_data);
                 break;
             //订单完成
             case "203":
+            case "206":
             case "99":
                 //订单取消 调度失败
-                $res=(new CoreOrderService())->CancelOrder($res_data);
+                $res1=(new CoreOrderService())->CancelOrder($res_data);
+
                 break;
             default:
+
+
                 break;
         }
 
-        $order=[
-            "order_id"=>$res_data["OrderCode"],
-            "state"=>$state,
-            "server_data"=>$res_data,
-        ];
-        (new OrderCallBackLogService())->add($order);
+        $result=(new CoreOrderService())->ChangeAppId($res_data);
+        (new CoreOrderService())->NotifyOrder($result);
 
         Log::write('订单回调完成' . json_encode($data,JSON_UNESCAPED_UNICODE));
 

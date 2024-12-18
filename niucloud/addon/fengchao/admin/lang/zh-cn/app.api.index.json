@@ -5,8 +5,10 @@
       "api_secret":"API key",
       "callbackUrl":"回调Url",
       "urlPlaceholder": "请输入回调Url",
+      "urlFormatError": "url 格式错误",
 
       "addApi":"创建 API",
       "apiDeleteTips":"确定要删除该数据吗？",
-      "sandbox":"接口测试"
+      "sandbox":"接口测试",
+      "sandbox1":"推送测试"
 }

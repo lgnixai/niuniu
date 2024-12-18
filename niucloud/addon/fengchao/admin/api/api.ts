@@ -41,6 +41,10 @@ export function getApiDomain() {
     return request.get(`fengchao/site/api/domain`)
 }
 
+export function getCBDomain() {
+    return request.get(`fengchao/site/api/notifyUrl`)
+}
+
 export function getApiNameList() {
     return request.get(`sandbox/fake/list`)
 }
@@ -52,4 +56,13 @@ export function getApiData(site_id:number,id:number) {
 
 export function sendSandBox(url:string,params: Record<string, any>) {
     return http.post(url, params,  )
+}
+
+
+export function getCBNameList() {
+    return request.get(`sandbox/cb/list`)
+}
+
+export function getCBData(site_id:number,id:number) {
+    return request.get(`sandbox/cb/${site_id}/${id}`)
 }

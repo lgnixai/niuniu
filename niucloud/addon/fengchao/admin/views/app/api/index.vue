@@ -24,6 +24,8 @@
             <template #default="{ row }">
               <el-button type="primary" link @click="sandboxEvent(row.id)">{{ t('sandbox') }}
               </el-button>
+              <el-button type="primary" link @click="callbackEvent(row.id)">{{ t('sandbox1') }}
+              </el-button>
               <el-button type="primary" link @click="deleteEvent(row.id)">{{ t('delete') }}
               </el-button>
             </template>
@@ -140,6 +142,10 @@ const deleteEvent = (id: number) => {
 }
 const sandboxEvent = (id: number) => {
   router.push('/fengchao/api/sandbox?id=' + id)
+}
+
+const callbackEvent = (id: number) => {
+  router.push('/fengchao/api/sandbox1?id=' + id)
 }
 
 

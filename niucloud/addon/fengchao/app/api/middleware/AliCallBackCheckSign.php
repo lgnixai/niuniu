@@ -35,8 +35,6 @@ class AliCallBackCheckSign
          $AppKey = env("fengchao.KDN_KEY");
          $verifySignData=(new SiteAuthService())->encrypt($requestData,$AppKey);
 
-//        Log::write('下单失败'.$verifySignData . date('Y-m-d H:i:s'));
-//        Log::write('下单失败'.$data["body"]["DataSign"]!==urldecode($verifySignData) . date('Y-m-d H:i:s'));
 
         if($data["body"]["DataSign"]!==urldecode($verifySignData)){
              throw new AuthException('回调数据签名错误');

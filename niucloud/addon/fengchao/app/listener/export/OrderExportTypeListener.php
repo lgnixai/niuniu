@@ -27,16 +27,17 @@ class OrderExportTypeListener
             'fengchao_order' => [
                 'name' => '订单导出',
                 'column' => [
-                    'order_code' => [ 'name' => '订单号'],
-                    'Weight' => [ 'name' => '重量'],
-                    'Cost'=> [ 'name' => '基础运费'],
-                    'InsureAmount'=> [ 'name' => '保价费'],
-                    'PackageFee'=> [ 'name' => '包装费'],
-                    'OverFee'=> [ 'name' => '超长超重费'],
-                    'OtherFee'=> [ 'name' => '其它'],
-                    'TotalFee' => [ 'name' => '总费用'],
-                    'Status' => [ 'name' => '状态'],
-                    'create_time' => [ 'name' => '时间'],
+                    'order_id' => ['name' => '平台订单号'],
+                    'client_order_code' => ['name' => '客户订单号'],
+                    'logistic_order_code' => ['name' => '物流订单号'],
+                    'send_province_name' => ['name' => '发货人省份'],
+                    'send_name' => ['name' => '发货人'],
+                    'receiver_province_name' => ['name' => '收件省份'],
+                    'receiver_name' => ['name' => '收件人'],
+                    'weight' => ['name' => '重量'],
+                    'total_fee' => ['name' => '费用'],
+                    'order_status_desc' => ['name' => '订单状态'],
+                    'create_time' => ['name' => '时间'],
 
                 ],
             ]

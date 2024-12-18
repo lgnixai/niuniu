@@ -32,10 +32,8 @@
             </el-row>
           </el-card>
 
-
             <el-card class="box-card !border-none mb-[10px] table-search-wrap" shadow="never">
                 <el-form :inline="true" :model="siteBalanceLogTableData.searchParam" ref="searchFormRef">
-
 
                     <el-form-item :label="t('createTime')" prop="create_time">
                         <el-date-picker v-model="siteBalanceLogTableData.searchParam.create_time" type="datetimerange"
@@ -80,8 +78,9 @@
                     <el-table-column prop="account_sum" :label="t('accountSum')" min-width="110" align="right" />
                     <el-table-column prop="account_type_name" :label="t('balanceType')" min-width="150" align="center" />
                     <el-table-column prop="from_type_name" :label="t('fromType')" min-width="120" align="" />
+                    <el-table-column prop="order_id" label="平台订单号" min-width="120" align="" />
+                    <el-table-column prop="memo" :label="t('memo')" min-width="120" align="" />
                     <el-table-column prop="create_time" :show-overflow-tooltip="true" :label="t('createTime')" min-width="150" />
-
 
                 </el-table>
                 <div class="mt-[16px] flex justify-end">
@@ -114,7 +113,7 @@ import { FormInstance } from 'element-plus'
 import { img } from '@/utils/common'
 import balanceInfo from '@/app/views/member/components/member-balance-info.vue'
 import { useRoute, useRouter } from 'vue-router'
-import {getSiteBalanceList,getSiteBalanceSum} from '@/addon/fengchao/api/api'
+import { getSiteBalanceList, getSiteBalanceSum } from '@/addon/fengchao/api/api'
 
 const route = useRoute()
 const pageName = route.meta.title
@@ -138,8 +137,6 @@ const siteBalanceLogTableData = reactive({
 
 const fromTypeList = ref([])
 
-
-
 const searchFormRef = ref<FormInstance>()
 
 const resetForm = (formEl: FormInstance | undefined) => {
@@ -155,7 +152,7 @@ const loadMemberAccountLogList = (page: number = 1) => {
     siteBalanceLogTableData.loading = true
     siteBalanceLogTableData.page = page
     if (siteBalanceLogTableData.searchParam.balance_type == '' || siteBalanceLogTableData.searchParam.balance_type == 'balance') {
-      getSiteBalanceList({
+        getSiteBalanceList({
             page: siteBalanceLogTableData.page,
             limit: siteBalanceLogTableData.limit,
             ...siteBalanceLogTableData.searchParam
@@ -196,8 +193,8 @@ const toMember = (member_id: number) => {
  */
 const balanceStatistics = ref(
     {
-      balance: 0,
-      balance_get: 0
+        balance: 0,
+        balance_get: 0
     })
 const checkBalanceInfo = () => {
     getSiteBalanceSum().then(res => {
@@ -206,16 +203,13 @@ const checkBalanceInfo = () => {
 }
 checkBalanceInfo()
 
-
-
-
 const exportSureDialog = ref(null)
 const flag = ref(false)
 const handleClose = (val) => {
-  flag.value = val
+    flag.value = val
 }
 const exportEvent = (data: any) => {
-  flag.value = true
+    flag.value = true
 }
 
 </script>

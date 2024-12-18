@@ -1,0 +1,1 @@
+import{_ as o}from"./news-card.vue_vue_type_script_setup_true_lang-9bccfb68.js";import"./index.vue_vue_type_script_setup_true_lang-c21881a6.js";import"./index-6405d5ac.js";/* empty css                 *//* empty css                        */export{o as default};

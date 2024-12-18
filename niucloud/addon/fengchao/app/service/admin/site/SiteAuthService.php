@@ -85,5 +85,9 @@ class SiteAuthService extends BaseAdminService
         return urlencode(base64_encode(md5($data.$api_secret)));
     }
 
+    public function encryptNoUrl($data, $api_secret) {
+        return (base64_encode(md5($data.$api_secret)));
+    }
+
 
 }

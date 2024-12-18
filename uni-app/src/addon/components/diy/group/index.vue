@@ -52,6 +52,12 @@
             <template v-if="component.componentName == 'Text'">
                 <diy-text :component="component" :global="data.global" :index="index" :pullDownRefreshCount="props.pullDownRefreshCount" :scrollBool="diyGroup.componentsScrollBool.Text" />
             </template>
+            <template v-if="component.componentName == 'Brand'">
+                <diy-brand :component="component" :global="data.global" :index="index" :pullDownRefreshCount="props.pullDownRefreshCount" :scrollBool="diyGroup.componentsScrollBool.Brand" />
+            </template>
+            <template v-if="component.componentName == 'Jhkd'">
+                <diy-jhkd :component="component" :global="data.global" :index="index" :pullDownRefreshCount="props.pullDownRefreshCount" :scrollBool="diyGroup.componentsScrollBool.Jhkd" />
+            </template>
             </view>
         </view>
         <template v-if="diyStore.mode == '' && data.global.bottomTabBarSwitch">
@@ -61,6 +67,8 @@
     </view>
 </template>
 <script lang="ts" setup>
+   import diyBrand from '@/addon/tk_jhkd/components/diy/brand/index.vue';
+   import diyJhkd from '@/addon/tk_jhkd/components/diy/jhkd/index.vue';
    import topTabbar from '@/components/top-tabbar/top-tabbar.vue'
    import useDiyStore from '@/app/stores/diy';
    import { useDiyGroup } from './useDiyGroup';

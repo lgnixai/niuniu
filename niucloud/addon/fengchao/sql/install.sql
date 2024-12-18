@@ -1,22 +1,3 @@
-DROP TABLE IF EXISTS `fenchao_order_fee`;
-CREATE TABLE `fenchao_order_fee` (
-                                     `order_id` varchar(100) NOT NULL DEFAULT '订单id',
-                                     `order_type` int(1) NOT NULL DEFAULT 0 COMMENT '订单类型',
-                                     `weight` decimal(10,2) NOT NULL COMMENT '重量',
-                                     `first_weight_amount` decimal(10,2) NOT NULL COMMENT '首重费用',
-                                     `continuous_weight_amount` decimal(10,2) NOT NULL COMMENT '续重费用',
-                                     `cost` decimal(10,2) NOT NULL COMMENT '成本',
-                                     `insure_amount` decimal(10,2) NOT NULL COMMENT '保价金额',
-                                     `package_fee` decimal(10,2) NOT NULL COMMENT '包装费用',
-                                     `over_fee` decimal(10,2) NOT NULL COMMENT '超重费用',
-                                     `other_fee` decimal(10,2) NOT NULL COMMENT '其他费用',
-                                     `other_fee_detail` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '其他费用详情' CHECK (json_valid(`other_fee_detail`)),
-                                     `total_fee` decimal(10,2) NOT NULL COMMENT '总费用',
-                                     `volume` decimal(10,2) NOT NULL COMMENT '体积',
-                                     `volume_weight` decimal(10,2) NOT NULL COMMENT '体积重量',
-                                     PRIMARY KEY (`order_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运费信息表';
-
 -- ----------------------------
 -- Table structure for fengchao_delivery_company
 -- ----------------------------
@@ -53,7 +34,7 @@ CREATE TABLE `fengchao_line_price` (
                                        `import_no` varchar(255) DEFAULT NULL,
                                        `delivery` varchar(255) DEFAULT NULL,
                                        PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9657 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点线路报价';
+) ENGINE=InnoDB AUTO_INCREMENT=47149 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点线路报价';
 
 -- ----------------------------
 -- Table structure for fengchao_line_price_log
@@ -65,7 +46,21 @@ CREATE TABLE `fengchao_line_price_log` (
                                            `import_no` varchar(30) NOT NULL DEFAULT '' COMMENT '导入编号',
                                            `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
                                            PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点线路报价';
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点线路报价';
+
+-- ----------------------------
+-- Table structure for fengchao_notify_log
+-- ----------------------------
+DROP TABLE IF EXISTS `fengchao_notify_log`;
+CREATE TABLE `fengchao_notify_log` (
+                                       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                                       `site_id` int(11) DEFAULT 0 COMMENT '站点id',
+                                       `url` varchar(255) NOT NULL COMMENT '推送url',
+                                       `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '业务数据',
+                                       `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
+                                       `status` int(11) NOT NULL DEFAULT 0 COMMENT '推送状态',
+                                       PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点请求和回调日志';
 
 -- ----------------------------
 -- Table structure for fengchao_order
@@ -79,6 +74,7 @@ CREATE TABLE `fengchao_order` (
                                   `order_discount_money` decimal(10,2) DEFAULT 0.00 COMMENT '订单优惠金额',
                                   `order_add_money` decimal(10,2) DEFAULT 0.00 COMMENT '订单优惠金额',
                                   `order_status` int(11) DEFAULT 0 COMMENT '订单状态',
+                                  `add_price_status` int(11) DEFAULT 0 COMMENT '补款状态',
                                   `refund_status` int(3) DEFAULT 0 COMMENT '退款状态',
                                   `out_trade_no` varchar(32) DEFAULT NULL COMMENT '支付编号',
                                   `pay_time` int(13) DEFAULT NULL COMMENT '支付时间',
@@ -90,7 +86,7 @@ CREATE TABLE `fengchao_order` (
                                   `delete_time` int(13) DEFAULT 0 COMMENT '删除时间',
                                   PRIMARY KEY (`id`) USING BTREE,
                                   KEY `id` (`id`,`site_id`,`order_id`,`create_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='订单列表';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='订单列表';
 
 -- ----------------------------
 -- Table structure for fengchao_order_callback_log
@@ -99,13 +95,12 @@ DROP TABLE IF EXISTS `fengchao_order_callback_log`;
 CREATE TABLE `fengchao_order_callback_log` (
                                                `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '订单唯一ID',
                                                `site_id` int(11) NOT NULL DEFAULT 0 COMMENT '站点id',
-                                               `order_code` varchar(30) NOT NULL COMMENT '商家订单编号',
+                                               `order_id` varchar(100) NOT NULL COMMENT '商家订单编号',
                                                `state` varchar(30) NOT NULL COMMENT '状态码',
-                                               `kdn_code` varchar(30) NOT NULL COMMENT '第三方快递鸟编号',
                                                `server_data` longtext NOT NULL COMMENT '服务端最终确认的信息',
                                                `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
                                                PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点回调日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点回调日志表';
 
 -- ----------------------------
 -- Table structure for fengchao_order_delivery
@@ -113,10 +108,12 @@ CREATE TABLE `fengchao_order_callback_log` (
 DROP TABLE IF EXISTS `fengchao_order_delivery`;
 CREATE TABLE `fengchao_order_delivery` (
                                            `order_id` varchar(44) NOT NULL DEFAULT '订单id',
+                                           `site_id` int(11) NOT NULL,
                                            `line_price_id` bigint(20) DEFAULT NULL,
+                                           `app_id` varchar(255) DEFAULT NULL,
                                            `client_order_code` varchar(100) NOT NULL DEFAULT '下游用户订单id',
-                                           `service_order_code` varchar(100) DEFAULT '上游服务商订单id',
-                                           `logistic_order_code` varchar(100) DEFAULT '上游服务商订单id',
+                                           `service_order_code` varchar(100) DEFAULT NULL,
+                                           `logistic_order_code` varchar(100) DEFAULT NULL,
                                            `order_info` longtext DEFAULT NULL COMMENT '订单原始数据',
                                            `picker_info` longtext DEFAULT NULL COMMENT '订单原始数据',
                                            `pay_info` longtext DEFAULT NULL COMMENT '订单原始数据',
@@ -125,14 +122,37 @@ CREATE TABLE `fengchao_order_delivery` (
                                            `volume` double DEFAULT NULL COMMENT '体积',
                                            `volume_weight` double DEFAULT NULL COMMENT '体积重量',
                                            `total_fee` double DEFAULT NULL COMMENT '体积重量',
-                                           `order_status_desc` varchar(60) DEFAULT NULL COMMENT '订单状态描述',
-                                           `order_status` varchar(5) DEFAULT '1' COMMENT '订单状态快递信息状态',
+                                           `order_status_desc` varchar(255) DEFAULT NULL COMMENT '订单状态描述',
+                                           `order_status` varchar(5) DEFAULT '0' COMMENT '订单状态快递信息状态',
                                            `create_time` int(13) DEFAULT NULL COMMENT '创建时间',
                                            `update_time` int(13) DEFAULT NULL COMMENT '更新时间',
                                            `delete_time` int(13) DEFAULT NULL COMMENT '删除时间',
                                            PRIMARY KEY (`order_id`) USING BTREE,
                                            KEY `order_id` (`order_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='订单快递信息表';
+
+-- ----------------------------
+-- Table structure for fengchao_order_fee
+-- ----------------------------
+DROP TABLE IF EXISTS `fengchao_order_fee`;
+CREATE TABLE `fengchao_order_fee` (
+                                      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                                      `order_id` varchar(100) NOT NULL DEFAULT '订单id',
+                                      `order_type` int(1) NOT NULL DEFAULT 0 COMMENT '订单类型',
+                                      `weight` decimal(10,2) NOT NULL COMMENT '重量',
+                                      `first_weight_amount` decimal(10,2) NOT NULL COMMENT '首重费用',
+                                      `continuous_weight_amount` decimal(10,2) NOT NULL COMMENT '续重费用',
+                                      `cost` decimal(10,2) NOT NULL COMMENT '成本',
+                                      `insure_amount` decimal(10,2) NOT NULL COMMENT '保价金额',
+                                      `package_fee` decimal(10,2) NOT NULL COMMENT '包装费用',
+                                      `over_fee` decimal(10,2) NOT NULL COMMENT '超重费用',
+                                      `other_fee` decimal(10,2) NOT NULL COMMENT '其他费用',
+                                      `other_fee_detail` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '其他费用详情' CHECK (json_valid(`other_fee_detail`)),
+                                      `total_fee` decimal(10,2) NOT NULL COMMENT '总费用',
+                                      `volume` decimal(10,2) NOT NULL COMMENT '体积',
+                                      `volume_weight` decimal(10,2) NOT NULL COMMENT '体积重量',
+                                      PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运费信息表';
 
 -- ----------------------------
 -- Table structure for fengchao_order_log
@@ -147,7 +167,7 @@ CREATE TABLE `fengchao_order_log` (
                                       `memo` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
                                       `response_data` longtext NOT NULL COMMENT '服务端数据',
                                       PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点请求和回调日志';
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点请求和回调日志';
 
 -- ----------------------------
 -- Table structure for fengchao_pay
@@ -166,7 +186,7 @@ CREATE TABLE `fengchao_pay` (
                                 `cancel_time` int(11) NOT NULL DEFAULT 0 COMMENT '关闭时间',
                                 `fail_reason` varchar(255) NOT NULL DEFAULT '' COMMENT '失败原因',
                                 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='支付记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='支付记录表';
 
 -- ----------------------------
 -- Table structure for fengchao_site
@@ -189,13 +209,13 @@ CREATE TABLE `fengchao_site_auth` (
                                       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                                       `site_id` int(11) NOT NULL DEFAULT 0 COMMENT '站点id',
                                       `api_name` varchar(255) NOT NULL DEFAULT '' COMMENT 'ApiName',
-                                      `api_key` text NOT NULL COMMENT 'api_key',
+                                      `api_key` bigint(20) NOT NULL COMMENT 'api_key',
                                       `api_secret` text NOT NULL COMMENT 'api_secret',
                                       `callback_url` text NOT NULL COMMENT '回调url',
                                       `delete_time` int(11) NOT NULL DEFAULT 0 COMMENT '删除时间',
                                       `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
-                                      PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点api验证';
+                                      PRIMARY KEY (`id`,`api_key`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='站点api验证';
 
 -- ----------------------------
 -- Table structure for fengchao_site_balance_log
@@ -214,4 +234,4 @@ CREATE TABLE `fengchao_site_balance_log` (
                                              `create_time` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
                                              `memo` varchar(255) NOT NULL DEFAULT '' COMMENT '备注信息',
                                              PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='会员账单表';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='会员账单表';

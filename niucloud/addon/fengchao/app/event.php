@@ -47,6 +47,7 @@ return [
             'addon\fengchao\app\listener\express\SendNotify'
         ],
 
+
         'OrderPriceConfirmAfter' => [
             'addon\fengchao\app\listener\express\OrderPriceConfirmAfter'
         ],

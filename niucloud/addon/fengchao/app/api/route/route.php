@@ -47,7 +47,9 @@ Route::group('express', function() {
 })->middleware(\addon\fengchao\app\api\middleware\AliCallBackCheckSign::class)
  ->middleware(ApiLog::class);
 
-
+Route::group('client', function() {
+    Route::post('callback', 'addon\fengchao\app\api\controller\client\Client@notify');
+});
 
 Route::group('express', function() {
      Route::post('test', 'addon\fengchao\app\api\controller\test\Express@notify');
@@ -55,10 +57,6 @@ Route::group('express', function() {
  })->middleware(\addon\fengchao\app\api\middleware\TestCheckSign::class);
 
 
-Route::group('client', function() {
-     Route::post('callback', 'addon\fengchao\app\api\controller\test\Client@notify');
-
- })->middleware(\addon\fengchao\app\api\middleware\TestCheckSign::class);
 
 
 

@@ -17,13 +17,13 @@
           <el-form-item :label="t('createTime')" prop="create_time">
             <el-date-picker v-model="orderTable.searchParam.create_time" type="datetimerange"
                             value-format="YYYY-MM-DD HH:mm:ss" :start-placeholder="t('startDate')"
-                            :end-placeholder="t('endDate')" />
+                            :end-placeholder="t('endDate')"/>
           </el-form-item>
 
           <el-form-item>
             <el-button type="primary" @click="loadOrderList()">{{ t('search') }}</el-button>
             <el-button @click="resetForm(searchFormRef)">{{ t('reset') }}</el-button>
-<!--            <el-button type="primary" @click="exportEvent">{{ t('export') }}</el-button>-->
+            <el-button type="primary" @click="exportEvent">{{ t('export') }}</el-button>
 
           </el-form-item>
         </el-form>
@@ -43,7 +43,7 @@
                   :content="row.order_id"
                   placement="top"
               >
-                <span> {{  (row.order_id) }}</span>
+                <span> {{ (row.order_id) }}</span>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -71,8 +71,9 @@
         </div>
       </div>
 
-      <export-sure ref="exportSureDialog" :show="flag" type="fengchao_order" :searchParam="orderTable.searchParam" @close="handleClose" />
-      <order-detail ref="orderDetailDialog"  />
+      <export-sure ref="exportSureDialog" :show="flag" type="fengchao_order" :searchParam="orderTable.searchParam"
+                   @close="handleClose"/>
+      <order-detail ref="orderDetailDialog"/>
 
     </el-card>
   </div>

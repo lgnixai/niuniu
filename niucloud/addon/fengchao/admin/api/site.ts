@@ -50,3 +50,8 @@ export function getBrandAll() {
 export function getCannelAll() {
     return request.get('fengchao/channel/all')
 }
+
+
+export function getLinePrice(params: Record<string, any>) {
+    return request.post(`fengchao/site/line/price`, params, { showSuccessMessage: true })
+}

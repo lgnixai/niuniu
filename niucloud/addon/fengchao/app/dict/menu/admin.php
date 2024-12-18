@@ -72,8 +72,8 @@ return [
                 'sort' => '0',
                 'status' => '1',
                 'is_show' => '0',
-
-            ],[
+            ],
+            [
                 'menu_name' => '查看运费',
                 'menu_key' => 'fengchao_config_delivery_shipping_template_view_edit',
                 'menu_short_name' => '查看运费',
@@ -86,7 +86,6 @@ return [
                 'sort' => '0',
                 'status' => '1',
                 'is_show' => '0',
-
             ],
             [
                 'menu_name' => '物流公司',

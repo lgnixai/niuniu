@@ -54,7 +54,8 @@
   "toSite": "访问站点",
   "noPermission": "您没有该站点的管理权限",
   "closeSiteTips": "是否要停止该站点？",
-  "editPrice":"设定价格模板",
+  "editPrice":"导入价格",
+  "viewPrice":"查看价格",
   "adjustPrice":"调整余额",
 
 
