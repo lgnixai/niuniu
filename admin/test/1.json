@@ -1,34 +1,76 @@
 {
-  "RequestData": {
-    "PushTime": "2024-12-19 02:39:23",
-    "EBusinessID": 100000313030,
-    "Data": [
-      {
-        "ShipperCode": "SF",
-        "CreateTime": "2023-10-10 20:20:57",
-        "OrderCode": "4eb7db9b-bbbf-3298-a19f-3bc495b73456",
-        "EBusinessID": 100000313030,
-        "PickerInfo": [
-          {
-            "PickupCode": "1234"
-          }
-        ],
-        "Cost": 0,
-        "Success": true,
-        "CallRequestType": "1801",
-        "Weight": 1,
-        "Reason": "订单已取件",
-        "LogisticCode": "SF1390004911440",
-        "State": "104",
-        "FetchTime": "",
-        "KDNOrderCode": "KDNIST2310101000000001",
-        "OperateType": 2,
-        "FCOrderCode": "20241219512358356324352"
+  "KdnOrderCode": "KDN2412181510003337",
+  "EBusinessID": 100005313534,
+  "Data": [
+    {
+      "100": {
+        "perationCode": "1872714",
+        "pushTime": "2024-12-18 15:57:42",
+        "logisticCode": "312583297972525",
+        "shipperCode": "YD"
       }
-    ],
-    "Count": 1
-  },
-  "Data": "",
-  "DataSign": "Y2RmMDZhYjExZDE3Yjc3NTQwODAxZDJjM2YzOTc4MTM=",
-  "RequestType": 103
+    },
+    {
+      "301": {
+        "perationCode": "YD",
+        "reason": "已揽件",
+        "overFee": null,
+        "cost": "6.45",
+        "ContinuousWeightAmount": "1.35",
+        "otherFee": "0.00",
+        "weight": 2,
+        "FirstWeightAmount": "5.10",
+        "volumeWeight": "0.00",
+        "shipperCode": "YD",
+        "volume": "0.00",
+        "insureAmount": null,
+        "otherFeeDetail": "{}",
+        "totalFee": 6.45,
+        "pickupCode": "1418",
+        "pushTime": "2024-12-18 22:05:11",
+        "logisticCode": "312583297972525",
+        "packageFee": "0.00"
+      }
+    },
+    {
+      "103": {
+        "personName": "刘万福",
+        "perationCode": "YD",
+        "reason": "订单已分配快递员",
+        "pickupCode": "1418",
+        "pushTime": "2024-12-18 16:05:37",
+        "personTel": "17881962952",
+        "logisticCode": "312583297972525",
+        "personCode": null,
+        "shipperCode": "YD"
+      }
+    },
+    {
+      "102": {
+        "perationCode": "YD",
+        "reason": "订单已分配快递员",
+        "stationCode": null,
+        "stationTel": null,
+        "pickupCode": "1418",
+        "stationName": null,
+        "pushTime": "2024-12-18 16:05:37",
+        "logisticCode": "312583297972525",
+        "stationAddress": null,
+        "shipperCode": "YD"
+      }
+    },
+    {
+      "2": {
+        "perationCode": "YD",
+        "reason": "【深圳市】已到达 广东深圳分拨交付中心",
+        "pushTime": "2024-12-19 02:26:02",
+        "logisticCode": "312583297972525",
+        "shipperCode": "YD"
+      }
+    }
+  ],
+  "UniquerRequestNumber": "b7aa0082-e51b-42ff-8a4c-dfffa5a5ce14",
+  "ResultCode": "100",
+  "Reason": "查询成功！",
+  "Success": true
 }

@@ -202,7 +202,7 @@ class CoreOrderService extends BaseApiService
             return true;
         } catch (Exception $e) {
             Db::rollback();
-            Log::write('下单失败' . date('Y-m-d H:i:s'));
+            Log::write('订单确认费用失败' . date('Y-m-d H:i:s'));
             Log::write($e->getMessage());
             throw new CommonException($e->getMessage());
         }
@@ -262,7 +262,7 @@ class CoreOrderService extends BaseApiService
             return true;
         } catch (Exception $e) {
             Db::rollback();
-            Log::write('下单失败' . date('Y-m-d H:i:s'));
+            Log::write('订单撤单退款失败' . date('Y-m-d H:i:s'));
             Log::write($e->getMessage());
             throw new CommonException($e->getMessage());
         }

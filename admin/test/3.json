@@ -1,0 +1,29 @@
+{
+  "ShipperCode": "YD",
+  "FirstWeightAmount": "5.10",
+  "Cost": 6.45,
+  "Success": true,
+  "Reason": "\u5df2\u63fd\u4ef6",
+  "PackageFee": "0.00",
+  "VolumeWeight": 0,
+  "OperateType": 2,
+  "CreateTime": "2024-12-18 22:05:15",
+  "ContinuousWeightAmount": "1.35",
+  "OrderCode": "20241218512202596384768",
+  "EBusinessID": "1872714",
+  "PickerInfo": [
+    {
+      "PickupCode": "1418"
+    }
+  ],
+  "CallRequestType": "1801",
+  "Weight": 2,
+  "LogisticCode": "312583297972525",
+  "TotalFee": 6.45,
+  "Volume": 0,
+  "State": "301",
+  "FetchTime": "",
+  "KDNOrderCode": "KDN2412181510003337",
+  "OtherFeeDetail": "{}",
+  "OtherFee": "0.00"
+}

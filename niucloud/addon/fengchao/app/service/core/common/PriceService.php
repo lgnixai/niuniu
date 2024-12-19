@@ -25,6 +25,23 @@ class PriceService extends BaseApiService
     public function PriceAndRule($params)
     {
 
+        $defaultParams = [
+            'Weight' => 0,
+            'FirstWeightAmount' => 0,
+            'ContinuousWeightAmount' => 0,
+            'Cost' => 0,
+            'InsureAmount' => 0,
+            'PackageFee' => 0,
+            'OverFee' => 0,
+            'OtherFee' => 0,
+            'OtherFeeDetail' => null,
+            'TotalFee' => 0,
+            'Volume' => 0,
+            'VolumeWeight' => 0,
+        ];
+
+        // 合并参数
+        $params = array_merge($defaultParams, $params);
 
         try {
             Db::startTrans();

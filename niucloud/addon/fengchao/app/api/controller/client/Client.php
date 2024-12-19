@@ -14,6 +14,8 @@ use addon\fengchao\app\service\core\CoreOrderService;
 use app\dict\pay\PayDict;
 use core\base\BaseApiController;
 use core\exception\AuthException;
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Key;
 use think\facade\Log;
 use think\Response;
 
@@ -55,10 +57,20 @@ class Client extends BaseApiController
         $requestData=($data["RequestData"]);
 
         //$requestData=json_decode($res["RequestData"],true);
-        $AppKey="7703e42a5240bb97ee3a9aedade177cbcfb14a8e1735bb0d6ee94711bc337487";
+        //$AppKey="330aa1fd76054c6c87a5672e6b9db88bbbc4454ba092edf4710518544df97c32";
+
+       // $verifySignData=(new SiteAuthService())->encrypt($requestData,$AppKey);
+        $auth=(new SiteAuthService())->getByAppKey($requestData["EBusinessID"]);
+        if(empty($auth)){
+            throw new AuthException('EBusinessID不存在');
+        }
+
+        $encryption_key = env("fengchao.encryption_key");
+
+        $api_secret = Crypto::decrypt($auth['api_secret'], Key::loadFromAsciiSafeString($encryption_key));
 
 
-        $verifySignData=(new SiteAuthService())->encryptNoUrl(json_encode($requestData),$AppKey);
+        $verifySignData=(new SiteAuthService())->encryptNoUrl(json_encode($requestData),$api_secret);
 
         Log::write($verifySignData  );
         Log::write($data["DataSign"] );
