@@ -107,12 +107,12 @@
 	}
 
 	const addAddress = () => {
-		const url = `/addon/tk_jhkd/pages/address/${tabs.value[current.value].key}_edit`
+		const url = `/addon/fengchao/pages/address/${tabs.value[current.value].key}_edit`
 		redirect({ url, param: { type: tabs.value[current.value].key, source: source.value } })
 	}
 
 	const editAddress = (id : number) => {
-		const url = `/addon/tk_jhkd/pages/address/${tabs.value[current.value].key}_edit`
+		const url = `/addon/fengchao/pages/address/${tabs.value[current.value].key}_edit`
 		redirect({ url, param: { id, type: tabs.value[current.value].key, source: source.value } })
 	}
 
@@ -151,7 +151,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	:deep(.u-tabs__wrapper__nav__line) {
 		bottom: 0;

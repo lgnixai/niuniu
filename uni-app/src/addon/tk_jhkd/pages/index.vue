@@ -37,7 +37,7 @@
 	import fixedGroup from '@/addon/components/fixed/group/index.vue'
 
 	const diy = useDiy({
-		name: 'DIY_TK_JHKD_INDEX'
+		name: 'DIY_fengchao_INDEX'
 	})
 
 	const diyGroupRef = ref(null)

@@ -15,10 +15,10 @@
 	import { ref, computed, watch, onMounted, nextTick, getCurrentInstance } from 'vue';
 	import useDiyStore from '@/app/stores/diy';
 	import { img } from '@/utils/common';
-	import { goto } from '@/addon/tk_jhkd/utils/ts/goto';
+	import { goto } from '@/addon/fengchao/utils/ts/goto';
 	import {
 		getBrand
-	} from '@/addon/tk_jhkd/api/tkjhkd'
+	} from '@/addon/fengchao/api/tkjhkd'
 	const props = defineProps(['component', 'index', 'pullDownRefreshCount']);
 
 	const diyStore = useDiyStore();
@@ -110,7 +110,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.tag {
 		background: #dddddd;

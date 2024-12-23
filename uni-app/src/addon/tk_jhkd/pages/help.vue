@@ -10,7 +10,7 @@
 		<mescroll-empty v-if="!listData" :option="{ tip: '没有地址数据' }"></mescroll-empty>
 	</mescroll-body>
 
-	<tabbar addon="tk_jhkd" />
+	<tabbar addon="fengchao" />
 </template>
 
 <script setup lang="ts">
@@ -18,7 +18,7 @@
 	import { onShow } from '@dcloudio/uni-app'
 	import {
 		help
-	} from '@/addon/tk_jhkd/api/tkjhkd'
+	} from '@/addon/fengchao/api/tkjhkd'
 	import MescrollBody from '@/components/mescroll/mescroll-body/mescroll-body.vue';
 	import MescrollEmpty from '@/components/mescroll/mescroll-empty/mescroll-empty.vue';
 	import useMescroll from '@/components/mescroll/hooks/useMescroll.js'
@@ -49,5 +49,5 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 </style>

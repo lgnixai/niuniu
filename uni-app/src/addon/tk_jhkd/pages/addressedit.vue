@@ -46,8 +46,8 @@
 		updateJhkdAddress,
 		getJhkdRegeo,
 		getJhkdAddressDetail, editJhkdAddress
-	} from '@/addon/tk_jhkd/api/tkjhkd'
-	import { goback } from '@/addon/tk_jhkd/utils/ts/goto';
+	} from '@/addon/fengchao/api/tkjhkd'
+	import { goback } from '@/addon/fengchao/utils/ts/goto';
 	const form = reactive({})
 	const show = ref()
 	const lat = ref<any>(25.23856)
@@ -57,7 +57,7 @@
 		title: '当前位置', //标记点的名称
 		latitude: 25.23856, //纬度
 		longitude: 103.04205, //经度
-		iconPath: '/addon/tk_jhkd/utils/images/location.png', //图标样式路径,用绝对路径,不要写前面的../
+		iconPath: '/addon/fengchao/utils/images/location.png', //图标样式路径,用绝对路径,不要写前面的../
 		width: 20, //图标宽度
 		height: 20, //图标高度
 	}])
@@ -94,14 +94,14 @@
 	const edit = async () => {
 		await editJhkdAddress(form)
 		uni.navigateTo({
-			url: '/addon/tk_jhkd/pages/addresslist'
+			url: '/addon/fengchao/pages/addresslist'
 		})
 		uni.$u.toast(res.msg)
 	}
 	const add = async () => {
 		const res = await updateJhkdAddress(form)
 		uni.navigateTo({
-			url: '/addon/tk_jhkd/pages/addresslist'
+			url: '/addon/fengchao/pages/addresslist'
 		})
 		uni.$u.toast(res.msg)
 
@@ -119,7 +119,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.allarea {
 		font-size: 24rpx;

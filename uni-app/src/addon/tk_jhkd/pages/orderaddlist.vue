@@ -14,7 +14,7 @@
 		<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getOrderListFn">
 			<view v-if="list.length > 0" class="tk-card" v-for="(item, index) in list" key="index">
 				<view class="text-xs font-weight" @click="
-            goto('/addon/tk_jhkd/pages/orderdetail?id=' + item.orderInfo.id)
+            goto('/addon/fengchao/pages/orderdetail?id=' + item.orderInfo.id)
           ">订单号:{{ item.order_id }}
 				</view>
 				<view class="fb flex justify-between">
@@ -130,7 +130,7 @@
 				v-if="!list.length && loading"></mescroll-empty>
 		</mescroll-body>
 	</view>
-	<tabbar addon="tk_jhkd" />
+	<tabbar addon="fengchao" />
 	<pay ref="payRef" @close="payLoading = false"></pay>
 </template>
 
@@ -142,12 +142,12 @@
 		getOrderList,
 		getOrderStatus,
 		deleteOrder,
-	} from "@/addon/tk_jhkd/api/orderadd";
+	} from "@/addon/fengchao/api/orderadd";
 	import MescrollBody from "@/components/mescroll/mescroll-body/mescroll-body.vue";
 	import MescrollEmpty from "@/components/mescroll/mescroll-empty/mescroll-empty.vue";
 	import useMescroll from "@/components/mescroll/hooks/useMescroll.js";
 	import { onLoad, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
-	import { goto } from "@/addon/tk_jhkd/utils/ts/goto";
+	import { goto } from "@/addon/fengchao/utils/ts/goto";
 	const payRef = ref(null);
 	const payLoading = ref(false);
 	const { mescrollInit, downCallback, getMescroll } = useMescroll(
@@ -171,7 +171,7 @@
 		payRef.value?.open(
 			"jhkdOrderAddPay",
 			item.id,
-			"/addon/tk_jhkd/pages/orderaddlist"
+			"/addon/fengchao/pages/orderaddlist"
 		);
 	};
 	//删除
@@ -225,7 +225,7 @@
 	};
 </script>
 <style lang="scss" scoped>
-	@import "@/addon/tk_jhkd/utils/styles/common.scss";
+	@import "@/addon/fengchao/utils/styles/common.scss";
 
 	.line-box1 {
 		background-color: #e3e3e3;

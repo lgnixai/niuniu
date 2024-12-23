@@ -16,7 +16,7 @@
 	import { onLoad } from '@dcloudio/uni-app'
 	import {
 		getAgreement
-	} from '@/addon/tk_jhkd/api/tkjhkd'
+	} from '@/addon/fengchao/api/tkjhkd'
 
 	let agreementType = ref('') // 协议类型
 	const agreementContent = ref('') // 协议内容
@@ -36,5 +36,5 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 </style>

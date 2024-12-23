@@ -112,7 +112,7 @@
 				</view>
 				<view @click="
             redirect({
-              url: '/addon/tk_jhkd/pages/agreement?type=jhkdyesgoods',
+              url: '/addon/fengchao/pages/agreement?type=jhkdyesgoods',
             })
           ">
 					阅读并同意《{{
@@ -140,7 +140,7 @@
 				</block>
 			</view>
 			<view class="font-bold text-xs mt-2" @click="
-          redirect({ url: '/addon/tk_jhkd/pages/agreement?type=jhkdyesgoods' })
+          redirect({ url: '/addon/fengchao/pages/agreement?type=jhkdyesgoods' })
         ">
 				《违禁品查询》</view>
 			<view class="flex items-center mt-[24rpx]">
@@ -240,14 +240,14 @@
 	<button @click="shareEvent()" class="fixed bottom-48 right-4 z-50 rounded-full p-2 text-white hover:bg-blue-700">
 		<u-icon name="share" color="#000000" size="24"></u-icon>
 	</button>
-	<share-poster ref="sharePosterRef" posterType="tk_jhkd_poster" :posterId="poster_id" :posterParam="posterParam"
+	<share-poster ref="sharePosterRef" posterType="fengchao_poster" :posterId="poster_id" :posterParam="posterParam"
 		:copyUrlParam="copyUrlParam" />
 	<pay ref="payRef" @close="payLoading = false"></pay>
 </template>-
 <script setup lang="ts">
 	import useDiyStore from "@/app/stores/diy";
 	import { ref, reactive, computed } from "vue";
-	import { goto } from "@/addon/tk_jhkd/utils/ts/goto";
+	import { goto } from "@/addon/fengchao/utils/ts/goto";
 	import { onLoad, onShow } from "@dcloudio/uni-app";
 	import {
 		preOrder,
@@ -255,7 +255,7 @@
 		getJhkdAddressInfo,
 		getAgreement,
 		checkFenxiao,
-	} from "@/addon/tk_jhkd/api/tkjhkd";
+	} from "@/addon/fengchao/api/tkjhkd";
 
 	import { redirect, img, handleOnloadParams } from "@/utils/common";
 	import { getAddressInfo } from "@/app/api/member";
@@ -265,7 +265,7 @@
 	const memberStore = useMemberStore();
 	const userInfo = computed(() => memberStore.info);
 	import { getToken, isWeixinBrowser, getSiteId } from "@/utils/common";
-	import { checkAddPayEvent } from "@/addon/tk_jhkd/utils/ts/common"
+	import { checkAddPayEvent } from "@/addon/fengchao/utils/ts/common"
 	checkAddPayEvent()
 	const list = ref([""]);
 	const startaddress = ref(null);
@@ -309,7 +309,7 @@
 	const shareEvent = () => {
 		// 检测是否登录
 		if (!userInfo.value) {
-			useLogin().setLoginBack({ url: "/addon/tk_jhkd/pages/ordersubmit" });
+			useLogin().setLoginBack({ url: "/addon/fengchao/pages/ordersubmit" });
 			return false;
 		}
 
@@ -367,13 +367,13 @@
 		uni.setStorage({
 			key: "selectAddressCallback",
 			data: {
-				back: "/addon/tk_jhkd/pages/ordersubmit",
+				back: "/addon/fengchao/pages/ordersubmit",
 				delivery: type,
 				value: type,
 			},
 			success() {
 				redirect({
-					url: "/addon/tk_jhkd/pages/address/address",
+					url: "/addon/fengchao/pages/address/address",
 					param: { type: "address" },
 				});
 			},
@@ -422,7 +422,7 @@
 			uni.$u.toast("请填写送件地址");
 			return;
 		}
-		useSubscribeMessage().request("tk_jhkd_order_sign");
+		useSubscribeMessage().request("fengchao_order_sign");
 		goodshow.value = true;
 		form.delivery_info = [];
 	};
@@ -452,7 +452,7 @@
 	const submitOrder = async () => {
 		checkAddPayEvent()
 		if (!userInfo.value) {
-			useLogin().setLoginBack({ url: "/addon/tk_jhkd/pages/ordersubmit" });
+			useLogin().setLoginBack({ url: "/addon/fengchao/pages/ordersubmit" });
 			return false;
 		}
 		if (form.goods == "") {
@@ -484,7 +484,7 @@
 		}
 
 		useSubscribeMessage().request(
-			"tk_jhkd_order_pay,tk_jhkd_order_pick,tk_jhkd_order_add"
+			"fengchao_order_pay,fengchao_order_pick,fengchao_order_add"
 		);
 		const data = await createOrder(form);
 		form.delivery_info = [];
@@ -494,7 +494,7 @@
 		payRef.value?.open(
 			data.data.trade_type,
 			data.data.trade_id,
-			"/addon/tk_jhkd/pages/orderlist"
+			"/addon/fengchao/pages/orderlist"
 		);
 	};
 	const selectPre = (e) => {
@@ -538,7 +538,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import "@/addon/tk_jhkd/utils/styles/common.scss";
+	@import "@/addon/fengchao/utils/styles/common.scss";
 
 	:root,
 	.tk-card1 {

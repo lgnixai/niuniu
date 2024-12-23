@@ -2,7 +2,7 @@
 	<view class="bg-[#F6F6F6] min-h-[100vh] w-full" :style="themeColor()" v-if="memberStore.info">
 		<view class="reseller fixed w-full z-2 !bg-[#F6F6F6]">
 			<view class="top mt-[-44rpx]"
-				:style="{ ...headerStyle, backgroundImage: 'url(' + img('addon/tk_jhkd/fenxiao/bjfx.png') + ')' }">
+				:style="{ ...headerStyle, backgroundImage: 'url(' + img('addon/fengchao/fenxiao/bjfx.png') + ')' }">
 
 				<view class="top1">
 					<view class="num1" style="">
@@ -17,7 +17,7 @@
 						</navigator>
 					</view>
 					<view class="fx" @click="shareEvent()">
-						<image class="icon1" :src="img('addon/tk_jhkd/fenxiao/fenxiang.png')" mode="aspectFit">
+						<image class="icon1" :src="img('addon/fengchao/fenxiao/fenxiang.png')" mode="aspectFit">
 						</image>
 						<view class="fxwz">分享</view>
 					</view>
@@ -43,7 +43,7 @@
 			<view v-if="fenxiaoinfo" class="icon">
 				<view class="ico">
 					<view class="tubiao">
-						<image class="img" :src="img('addon/tk_jhkd/fenxiao/yifx.png')"></image>
+						<image class="img" :src="img('addon/fengchao/fenxiao/yifx.png')"></image>
 					</view>
 					<view class="tt">
 						<view class="text_r">{{fenxiaoinfo.first_num}}</view>
@@ -52,7 +52,7 @@
 				</view>
 				<view class="ico">
 					<view class="tubiao">
-						<image class="img" :src="img('addon/tk_jhkd/fenxiao/fxtd.png')"></image>
+						<image class="img" :src="img('addon/fengchao/fenxiao/fxtd.png')"></image>
 					</view>
 					<view class="tt">
 						<view class="text_r">{{fenxiaoinfo.second_num}}</view>
@@ -61,7 +61,7 @@
 				</view>
 				<view class="ico">
 					<view class="tubiao">
-						<image class="img" :src="img('addon/tk_jhkd/fenxiao/yidd.png')"></image>
+						<image class="img" :src="img('addon/fengchao/fenxiao/yidd.png')"></image>
 					</view>
 					<view class="tt">
 						<view class="text_r">{{fenxiaoinfo.first_order_num}}</view>
@@ -70,7 +70,7 @@
 				</view>
 				<view class="ico">
 					<view class="tubiao">
-						<image class="img" :src="img('addon/tk_jhkd/fenxiao/erdd.png')"></image>
+						<image class="img" :src="img('addon/fengchao/fenxiao/erdd.png')"></image>
 					</view>
 					<view class="tt">
 						<view class="text_r">{{fenxiaoinfo.second_order_num}}</view>
@@ -82,9 +82,9 @@
 			<view class="kong"></view>
 		</view>
 	</view>
-	<share-poster ref="sharePosterRef" posterType="tk_jhkd_poster" :posterId="poster_id" :posterParam="posterParam"
-		:copyUrlParam="copyUrlParam" :copyUrl="'/addon/tk_jhkd/pages/index'" />
-	<tabbar addon="tk_jhkd" />
+	<share-poster ref="sharePosterRef" posterType="fengchao_poster" :posterId="poster_id" :posterParam="posterParam"
+		:copyUrlParam="copyUrlParam" :copyUrl="'/addon/fengchao/pages/index'" />
+	<tabbar addon="fengchao" />
 	<pay ref="payRef" @close="payLoading = false"></pay>
 </template>
 
@@ -96,7 +96,7 @@
 	import { onLoad, onPageScroll, onReachBottom } from '@dcloudio/uni-app';
 	import {
 		checkFenxiao, getFenxiaoInfo
-	} from '@/addon/tk_jhkd/api/fenxiao'
+	} from '@/addon/fengchao/api/fenxiao'
 	import { useLogin } from '@/hooks/useLogin'
 	const userInfo = computed(() => memberStore.info)
 	/************* 分享海报-start **************/
@@ -119,7 +119,7 @@
 
 		// 检测是否登录
 		if (!userInfo.value) {
-			useLogin().setLoginBack({ url: '/addon/tk_jhkd/pages/index' })
+			useLogin().setLoginBack({ url: '/addon/fengchao/pages/index' })
 			return false
 		}
 		if (userInfo.value && userInfo.value.member_id)
@@ -177,7 +177,7 @@
 	})
 </script>
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.class-select {
 		position: relative;

@@ -26,18 +26,15 @@ return [
 
         ],
         //订单创建后
+        'CreateOrder' => [
+            'addon\fengchao\app\listener\order\CreateOrder',
+            //'addon\fengchao\app\listener\point_exchange\AfterfengchaoOrderCreate',   //积分商城业务
+        ],
+        //订单创建后
         'AfterOrderCreate' => [
             'addon\fengchao\app\listener\order\AfterOrderCreate',
             //'addon\fengchao\app\listener\point_exchange\AfterfengchaoOrderCreate',   //积分商城业务
         ],
-
-        //订单创建
-        'PayCreate' => ['addon\fengchao\app\listener\pay\PayCreateListener'],
-
-
-        //支付成功
-        'PaySuccess' => ['addon\fengchao\app\listener\pay\PaySuccessListener'],
-
         // 收到快递推送
         'ListenNotifyAfter' => [
             'addon\fengchao\app\listener\express\ListenNotifyAfter'
@@ -47,10 +44,36 @@ return [
             'addon\fengchao\app\listener\express\SendNotify'
         ],
 
-
         'OrderPriceConfirmAfter' => [
             'addon\fengchao\app\listener\express\OrderPriceConfirmAfter'
         ],
+
+        //订单创建
+        'PayCreate' => ['addon\fengchao\app\listener\pay\PayCreateListener'],
+
+
+        //支付成功
+        'PaySuccess' => ['addon\fengchao\app\listener\pay\PaySuccessListener'],
+
+//        'PayCreate' => ['addon\fengchao\app\listener\pay\PayCreateListener'],
+//        //支付成功
+//        'PaySuccess' => ['addon\fengchao\app\listener\pay\PaySuccessListener'],
+        //退款成功
+        'RefundSuccess'=>['addon\fengchao\app\listener\pay\RefundSuccessListener'],
+        //发单操作
+        'OrderSend'=>['addon\fengchao\app\listener\order\OrderSendListener'],
+        //订单完成事件
+        'JhkdOrderFinish'=>['addon\fengchao\app\listener\order\OrderFinishListener'],
+        //取消订单，已付款情况
+        'CancelOrder'=>['addon\fengchao\app\listener\order\OrderCancelListener'],
+        //预下单--封装接口
+        "DeliveryPreOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryPreOrderListener'],
+        //发送下单--封装接口
+        "DeliverySendOrder"=>['addon\fengchao\app\listener\order\delivery\DeliverySendOrderListener'],
+        //取消下单--封装接口
+        "DeliveryCancelOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryCancelOrderListener'],
+
+        'JhkdPlatformType' => ['addon\fengchao\app\listener\platform\PlatformListener'],
 
 
 

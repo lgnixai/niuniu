@@ -138,7 +138,7 @@
 			<view v-else class="text-xs text-slate-400">暂无运单动态</view>
 		</view>
 	</view>
-	<tabbar addon="tk_jhkd" />
+	<tabbar addon="fengchao" />
 	<pay ref="payRef" @close="payLoading = false"></pay>
 </template>
 
@@ -152,13 +152,13 @@
 	} from '@dcloudio/uni-app'
 	import {
 		getOrderDetail, applyRefund, deleteOrder, getDeliveryInfo, closeOrder
-	} from '@/addon/tk_jhkd/api/order'
+	} from '@/addon/fengchao/api/order'
 	import {
 		goback, goto
-	} from '@/addon/tk_jhkd/utils/ts/goto';
+	} from '@/addon/fengchao/utils/ts/goto';
 	import {
 		timeChange
-	} from '@/addon/tk_jhkd/utils/ts/common';
+	} from '@/addon/fengchao/utils/ts/common';
 	import { img, copy } from '@/utils/common'
 	const payRef = ref(null)
 	const payLoading = ref(false)
@@ -188,12 +188,12 @@
 	//关闭
 	const close = async () => {
 		await closeOrder(form.id)
-		goto('/addon/tk_jhkd/pages/orderlist')
+		goto('/addon/fengchao/pages/orderlist')
 	}
 	//删除
 	const del = async () => {
 		await deleteOrder(form.id)
-		goto('/addon/tk_jhkd/pages/orderlist')
+		goto('/addon/fengchao/pages/orderlist')
 	}
 	//退款
 	const refund = async () => {
@@ -202,7 +202,7 @@
 			close_reason: '用户主动退款'
 		};
 		await applyRefund(params)
-		goto('/addon/tk_jhkd/pages/orderlist')
+		goto('/addon/fengchao/pages/orderlist')
 	}
 	//评价
 	const evaluate = () => {
@@ -214,7 +214,7 @@
 	}
 	const gopay = () => {
 		payLoading.value = true
-		payRef.value?.open(form.payInfo.trade_type, form.payInfo.trade_id, '/tk_jhkd/pages/orderdetail?id=' + form.id)
+		payRef.value?.open(form.payInfo.trade_type, form.payInfo.trade_id, '/fengchao/pages/orderdetail?id=' + form.id)
 	}
 	const getTrance = async (deliveryid) => {
 		const data = await getDeliveryInfo(deliveryid)
@@ -225,7 +225,7 @@
 		if (data.data.order_status_arr == null) {
 			uni.$u.toast('订单不存在或删除')
 			setTimeout(function () {
-				goto('/addon/tk_jhkd/pages/orderlist');
+				goto('/addon/fengchao/pages/orderlist');
 			}, 1000);
 		}
 		Object.assign(form, data.data)
@@ -244,7 +244,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.class-select {
 		position: relative;

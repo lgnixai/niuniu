@@ -37,6 +37,16 @@ use think\facade\Route;
 
 
 Route::group('fengchao', function () {
+
+    //配置列表
+    Route::get('platform/list', 'addon\fengchao\app\adminapi\controller\config\Platform@platformList');
+    //配置详情
+    Route::get('platform/config/:type', 'addon\fengchao\app\adminapi\controller\config\Platform@platformConfig');
+    //配置修改
+    Route::put('platform/config/:type', 'addon\fengchao\app\adminapi\controller\config\Platform@editPlatform');
+    Route::get('getconfig', 'addon\fengchao\app\adminapi\controller\Config@getConfig');
+
+
     Route::post('line/price', 'addon\fengchao\app\adminapi\controller\site\LinePrice@add');
     Route::post('site/line/price', 'addon\fengchao\app\adminapi\controller\site\LinePrice@getBySiteId');
 

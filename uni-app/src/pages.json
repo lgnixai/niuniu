@@ -320,71 +320,71 @@
                     }
 				},
                 // FCBOX_PAGE_END
-        // TK_JHKD_PAGE_BEGIN
+        // fengchao_PAGE_BEGIN
 			// *********************************** 聚合快递 ***********************************
 			{
-				"path": "tk_jhkd/pages/address/address",
+				"path": "fengchao/pages/address/address",
 				"style": {
 					"navigationBarTitleText": "地址列表"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/address/address_edit",
+				"path": "fengchao/pages/address/address_edit",
 				"style": {
 					"navigationBarTitleText": "快递地址"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/address/location_address_edit",
+				"path": "fengchao/pages/address/location_address_edit",
 				"style": {
 					"navigationBarTitleText": "同城地址"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/agreement",
+				"path": "fengchao/pages/agreement",
 				"style": {
 					"navigationBarTitleText": "协议详情"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/help",
+				"path": "fengchao/pages/help",
 				"style": {
 					"navigationBarTitleText": "帮助中心"
 				},
 				"needLogin": false
 			},
 			{
-				"path": "tk_jhkd/pages/ordersubmit",
+				"path": "fengchao/pages/ordersubmit",
 				"style": {
 					"navigationBarTitleText": "快递下单"
 				}
 			},
 			{
-				"path": "tk_jhkd/pages/orderlist",
+				"path": "fengchao/pages/orderlist",
 				"style": {
 					"navigationBarTitleText": "订单列表"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/orderaddlist",
+				"path": "fengchao/pages/orderaddlist",
 				"style": {
 					"navigationBarTitleText": "补单列表"
 				},
 				"needLogin": true
 			},
 			{
-				"path": "tk_jhkd/pages/orderdetail",
+				"path": "fengchao/pages/orderdetail",
 				"style": {
 					"navigationBarTitleText": "订单详情"
 				},
 				"needLogin": true
 			}, {
-				"path": "tk_jhkd/pages/index",
+				"path": "fengchao/pages/index",
 				"style": {
 					"navigationBarTitleText": "首页",
 					// #ifndef H5
@@ -398,7 +398,7 @@
 
 			},
 			{
-				"path": "tk_jhkd/pages/member",
+				"path": "fengchao/pages/member",
 				"style": {
 					"navigationBarTitleText": "个人中心",
 					// #ifndef H5
@@ -410,13 +410,13 @@
 				}
 			},
 			{
-				"path": "tk_jhkd/pages/fenxiao/index",
+				"path": "fengchao/pages/fenxiao/index",
 				"style": {
 					"navigationBarTitleText": "分销中心"
 				},
 				"needLogin": true
 			},
-			// TK_JHKD_PAGE_END
+			// fengchao_PAGE_END
 // {{ PAGE_END }}}
 				{
 					"path": "end"

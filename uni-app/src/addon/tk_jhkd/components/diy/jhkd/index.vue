@@ -27,7 +27,7 @@
 						<view class="flex items-center">
 							<text class="bt text-sm"
 								:style="{ background:diyComponent.btbackground,color:diyComponent.btfontcolor, }"
-								@click="goto('/addon/tk_jhkd/pages/ordersubmit')">{{diyComponent.btname}}</text>
+								@click="goto('/addon/fengchao/pages/ordersubmit')">{{diyComponent.btname}}</text>
 						</view>
 
 					</view>
@@ -40,7 +40,7 @@
 						<view class="flex items-center">
 							<text class="bt text-sm"
 								:style="{ background:diyComponent.btbackground,color:diyComponent.btfontcolor, }"
-								@click="goto('/addon/tk_jhkd/pages/ordersubmit')">{{diyComponent.btname}}</text>
+								@click="goto('/addon/fengchao/pages/ordersubmit')">{{diyComponent.btname}}</text>
 						</view>
 
 					</view>
@@ -53,7 +53,7 @@
 <script setup lang="ts">
 	import { ref, computed, watch, onMounted, nextTick, getCurrentInstance } from 'vue';
 	import useDiyStore from '@/app/stores/diy';
-	import { goto } from '@/addon/tk_jhkd/utils/ts/goto';
+	import { goto } from '@/addon/fengchao/utils/ts/goto';
 	import { img } from '@/utils/common';
 
 	const props = defineProps(['component', 'index', 'pullDownRefreshCount']);
@@ -141,7 +141,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.tag {
 		background: #dddddd;

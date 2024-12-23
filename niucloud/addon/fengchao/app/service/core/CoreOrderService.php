@@ -66,14 +66,37 @@ class CoreOrderService extends BaseApiService
         return true;
     }
 
-    public function preOrder($params)
+    //预下单
+    public function PreOrder($params)
     {
-        $dataInfo=(new LinePriceService())->getLinePrice($params);
-        usort($dataInfo, function ($a, $b) {
-            return $a['totalFee'] <=> $b['totalFee'];
-        });
+
+        $resInfo = event('DeliveryPreOrder', ['site_id' => $this->site_id, 'data' => $params]);
+        $dataInfo = $resInfo[0];
 
         return $dataInfo;
+    }
+    //主动取消退款
+    public function  CancelOrder($data)
+    {
+        Db::startTrans();
+        try {
+
+            $client_id= (new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+
+            $res=event('DeliveryCancelOrder', ['site_id' => $this->site_id, 'data' => [
+
+                'order_id' => $client_id,
+                'platform' => 'kdniao',
+            ]]);
+
+            Db::commit();
+            return $res[0];
+        } catch (Exception $e) {
+            Db::rollback();
+            Log::write('===聚合快递退款失败===' . date('Y-m-d H:i:s'));
+            Log::write($e->getMessage());
+            throw new CommonException($e->getMessage());
+        }
     }
     //下单
     public function createOrder($data)
@@ -86,17 +109,17 @@ class CoreOrderService extends BaseApiService
 
             $linePrice=(new LinePriceService())->getOrderLinePrice($data);
 
-            $order = [
-                "site_id" => $this->site_id,
-                'ip' => request()->ip() ?? '',
-                "order_id" => $data["result"]["OrderCode"],
-            ];
-            $this->model->save($order);
+//            $order = [
+//                "site_id" => $this->site_id,
+//                'ip' => request()->ip() ?? '',
+//                "order_id" => $data["result"]["OrderCode"],
+//            ];
+//            $this->model->save($order);
 
             $order_delivery = [
                 "site_id" => $this->site_id,
                 "app_id" => $this->member_id,
-                "order_id" => $order["order_id"],
+                "order_id" => $data['order_id'],
                 "line_price_id" => $linePrice["id"],
                 "client_order_code" => $data["OrderCode"],
                 "service_order_code" => $data["result"]["KDNOrderCode"],
@@ -107,7 +130,7 @@ class CoreOrderService extends BaseApiService
 
 
             $pay_data = [
-                "order_id" => $order["order_id"],
+                "order_id" => $data["order_id"],
                 "site_id" => $this->site_id,
                 "trade_type" => 1,
                 "money" => $linePrice["totalFee"],
@@ -210,7 +233,7 @@ class CoreOrderService extends BaseApiService
         return true;
     }
 //回调
-    public function CancelOrder($data)
+    public function RefundOrder($data)
     {
 
         Log::write("回调---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');

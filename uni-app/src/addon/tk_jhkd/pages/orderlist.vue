@@ -135,7 +135,7 @@
 						</block>
 					</view>
 					<view class="flex">
-						<view class="tk-tag" @click="goto('/addon/tk_jhkd/pages/orderdetail?id=' + item.id)">查看详情</view>
+						<view class="tk-tag" @click="goto('/addon/fengchao/pages/orderdetail?id=' + item.id)">查看详情</view>
 						<view v-if="item.addorderInfo&&item.addorderInfo.order_status==0"
 							@click="payAdd(item.addorderInfo.id)" class="tk-tag1 ml-2">补差价</view>
 					</view>
@@ -150,7 +150,7 @@
 	<up-modal :show="orders.show" @confirm="confirm(item1.class, item)" ref="uModal" @cancel="orders.show = false"
 		:showCancelButton="true" :content="orders.msg" :asyncClose="true"></up-modal>
 
-	<tabbar addon="tk_jhkd" />
+	<tabbar addon="fengchao" />
 	<pay ref="payRef" @close="payLoading = false"></pay>
 </template>
 
@@ -164,21 +164,21 @@
 		applyRefund,
 		deleteOrder,
 		closeOrder,
-	} from "@/addon/tk_jhkd/api/order";
+	} from "@/addon/fengchao/api/order";
 	import MescrollBody from "@/components/mescroll/mescroll-body/mescroll-body.vue";
 	import MescrollEmpty from "@/components/mescroll/mescroll-empty/mescroll-empty.vue";
 	import useMescroll from "@/components/mescroll/hooks/useMescroll";
 	import { onLoad, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
-	import { goto } from "@/addon/tk_jhkd/utils/ts/goto";
-	import { confirm } from "@/addon/tk_jhkd/utils/ts/alert";
-	// import { checkAddPayEvent } from "@/addon/tk_jhkd/utils/ts/common"
+	import { goto } from "@/addon/fengchao/utils/ts/goto";
+	import { confirm } from "@/addon/fengchao/utils/ts/alert";
+	// import { checkAddPayEvent } from "@/addon/fengchao/utils/ts/common"
 	// checkAddPayEvent()
 	const payAdd = (e) => {
 		payLoading.value = true;
 		payRef.value?.open(
 			"jhkdOrderAddPay",
 			e,
-			"/addon/tk_jhkd/pages/orderlist"
+			"/addon/fengchao/pages/orderlist"
 		);
 	};
 	interface Order {
@@ -240,7 +240,7 @@
 		payRef.value?.open(
 			item.payInfo.trade_type,
 			item.payInfo.trade_id,
-			"/addon/tk_jhkd/pages/orderlist?status=" + orderState.value
+			"/addon/fengchao/pages/orderlist?status=" + orderState.value
 		);
 	};
 	const del = async (item : Order) => {
@@ -308,7 +308,7 @@
 </script>
 
 <style lang="scss" scoped>
-	//@import "@/addon/tk_jhkd/utils/styles/common.scss";
+	//@import "@/addon/fengchao/utils/styles/common.scss";
 	.line-box1 {
 		background-color: #e3e3e3;
 		height: 2rpx;

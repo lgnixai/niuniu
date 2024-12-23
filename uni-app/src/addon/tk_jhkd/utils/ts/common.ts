@@ -1,4 +1,4 @@
-import { checkAddPay } from "@/addon/tk_jhkd/api/orderadd";
+import { checkAddPay } from "@/addon/fengchao/api/orderadd";
 import { redirect } from "@/utils/common"
 export function dateChange(date) {
 	return new Date(date).getTime() // 将日期值转换为时间戳

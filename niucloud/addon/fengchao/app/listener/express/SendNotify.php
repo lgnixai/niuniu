@@ -108,7 +108,7 @@ class SendNotify
     {
         $timestamp = (string)intval(microtime((bool)1) * 1000);
          $url="http://127.0.0.1:8888/api/client/callback";
-        $url="http://kd.fengchao100.com:8888/api/tk_jhkd/kdniaonotice";
+        $url="http://kd.fengchao100.com:8888/api/fengchao/kdniaonotice";
         $header = ["Content-Type: application/json;charset=UTF-8"];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);

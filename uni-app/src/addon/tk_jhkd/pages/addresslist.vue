@@ -7,7 +7,7 @@
 					<view class="text-base">{{ item.mobile }}</view>
 				</view>
 				<u-icon class="mr-[22rpx]" name="edit-pen" color="#8a899c" size="18"
-					@click="goto('/tk_jhkd/pages/addressedit?id=' + item.id)"></u-icon>
+					@click="goto('/fengchao/pages/addressedit?id=' + item.id)"></u-icon>
 			</view>
 
 			<view class="tk-b-bottom mt-[-4px]"></view>
@@ -20,7 +20,7 @@
 			</view>
 		</view>
 		<mescroll-empty v-if="!listData.length && loading" :option="{ tip: '没有地址数据' }"></mescroll-empty>
-		<view class="tk-butto" @click="goto('/addon/tk_jhkd/pages/addressedit')">新增地址</view>
+		<view class="tk-butto" @click="goto('/addon/fengchao/pages/addressedit')">新增地址</view>
 	</mescroll-body>
 
 </template>
@@ -34,9 +34,9 @@
 	} from '@dcloudio/uni-app'
 	import {
 		getJhkdAddressList, deleteJhkdAddress
-	} from '@/addon/tk_jhkd/api/tkjhkd'
+	} from '@/addon/fengchao/api/tkjhkd'
 	import { t } from '@/locale'
-	import { goto } from '@/addon/tk_jhkd/utils/ts/goto';
+	import { goto } from '@/addon/fengchao/utils/ts/goto';
 	import MescrollBody from '@/components/mescroll/mescroll-body/mescroll-body.vue';
 	import MescrollEmpty from '@/components/mescroll/mescroll-empty/mescroll-empty.vue';
 	import useMescroll from '@/components/mescroll/hooks/useMescroll.js'
@@ -52,7 +52,7 @@
 	const selectaddress = (id) => {
 		let addresstype = uni.getStorageSync('addresstype')
 		uni.setStorageSync(addresstype, listData.value[id])
-		goto('/tk_jhkd/pages/ordersubmit')
+		goto('/fengchao/pages/ordersubmit')
 	}
 	const getAddressListFn = (mescroll) => {
 		let data = ref({});
@@ -83,7 +83,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	.setmoren {
 		background: linear-gradient(-90deg, #67c6d0 0%, #19d444 100%);

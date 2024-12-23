@@ -206,7 +206,7 @@
 				setTimeout(() => {
 					btnDisabled.value = false
 					redirect({
-						url: '/addon/tk_jhkd/pages/address/address',
+						url: '/addon/fengchao/pages/address/address',
 						mode: 'redirectTo',
 						param: { type: type.value, source: source.value }
 					})

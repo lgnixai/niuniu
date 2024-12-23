@@ -42,7 +42,7 @@
 	const userInfo = computed(() => memberStore.info)
 
 	const diy = useDiy({
-		name: 'DIY_TK_JHKD_MEMBER_INDEX'
+		name: 'DIY_fengchao_MEMBER_INDEX'
 	})
 
 	const diyGroupRef = ref(null)

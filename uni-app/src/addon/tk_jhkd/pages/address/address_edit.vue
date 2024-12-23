@@ -57,7 +57,7 @@
 	import { redirect } from '@/utils/common'
 	import { t } from '@/locale'
 	import { addAddress, editAddress, getAddressInfo } from '@/app/api/member'
-	import { fanyiAddress } from '@/addon/tk_jhkd/api/tkjhkd'
+	import { fanyiAddress } from '@/addon/fengchao/api/tkjhkd'
 	const addressInfo = ref()
 	const formData = ref({
 		id: 0,
@@ -176,7 +176,7 @@
 				setTimeout(() => {
 					btnDisabled.value = false
 					redirect({
-						url: '/addon/tk_jhkd/pages/address/address',
+						url: '/addon/fengchao/pages/address/address',
 						mode: 'redirectTo',
 						param: { type: type.value, source: source.value }
 					})
@@ -190,7 +190,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/addon/tk_jhkd/utils/styles/common.scss';
+	@import '@/addon/fengchao/utils/styles/common.scss';
 
 	page {
 		--primary-color: #4541c7;
