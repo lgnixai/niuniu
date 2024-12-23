@@ -5,6 +5,7 @@ namespace addon\fengchao\app\service\core;
 use core\base\BaseApiService;
 use core\exception\CommonException;
 use think\Exception;
+use think\facade\Log;
 use function Symfony\Component\Translation\t;
 use addon\fengchao\app\model\site\LinePrice;
 /**
@@ -17,14 +18,42 @@ class LinePriceService extends BaseApiService
         parent::__construct();
         $this->model = new   LinePrice();
     }
+    public function   convertToShortName($name) {
+    // 替换规则
+    $patterns = [
+        "自治区" => "",
+        "省" => "",
+        "市" => "",
+        "壮族" => "",
+        "回族" => "",
+        "维吾尔" => ""
+    ];
+
+    // 依次替换
+    foreach ($patterns as $key => $replacement) {
+        $name = str_replace($key, $replacement, $name);
+    }
+
+return $name;
+}
 
 
-    public function getLinePrice($data)
+public function getLinePrice($data)
     {
+        //我需要在str_replace 中去掉省，或者市
 
-        $sender_province=str_replace("省", "",$data["Sender"]["ProvinceName"]);
-        $receive_province=str_replace("省", "",$data["Receiver"]["ProvinceName"]);
+//        $sender_province=preg_replace ( '/(省|市|)$/u' , '' , $data["Sender"]["ProvinceName"]);
+//        $receive_province=preg_replace ( '/(省|市)$/u' , "",$data["Receiver"]["ProvinceName"]);
+          $sender_province=$this->convertToShortName( $data["Sender"]["ProvinceName"]);
+        $receive_province=$this->convertToShortName($data["Receiver"]["ProvinceName"]);
+
+
         $weight=$data["Weight"];
+
+        Log::write('请求 1815 发件省' . $sender_province);
+        Log::write('请求 1815 收件省' . $sender_province);
+        Log::write('请求 1815  site_id' . $this->site_id);
+
 
         $first_weight=1;
         $continuous_weight=abs($weight-1>0 ? $weight - 1 : 0);
@@ -36,6 +65,7 @@ class LinePriceService extends BaseApiService
                 [ 'receive_province', '=', $receive_province ] ])
             ->order($order)->select()->toArray();
 
+        Log::write('请求 1815价格数据' .json_encode($linePrice));
 
         $prices=[];
         foreach ($linePrice as $k => $v) {
@@ -60,8 +90,8 @@ class LinePriceService extends BaseApiService
     public function getOrderLinePrice($data)
     {
 
-        $sender_province=str_replace("省", "",$data["Sender"]["ProvinceName"]);
-        $receive_province=str_replace("省", "",$data["Receiver"]["ProvinceName"]);
+        $sender_province=$this->convertToShortName(  $data["Sender"]["ProvinceName"]);
+        $receive_province=$this->convertToShortName($data["Receiver"]["ProvinceName"]);
         $shipper_code=$data["ShipperCode"];
         $weight=$data["Weight"];
 

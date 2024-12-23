@@ -18,8 +18,10 @@ import useMemberStore from '@/stores/member'
 import '@/assets/styles/index.scss'
 
 if (process.client) {
+
 	const match = location.href.match(/\/web\/(\d*)\//)
 	const cookie = useCookie('siteId')
+
 	match ? cookie.value = match[1] : cookie.value = null
 }
 

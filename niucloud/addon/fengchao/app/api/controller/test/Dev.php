@@ -8,6 +8,8 @@ namespace addon\fengchao\app\api\controller\test;
  use addon\fengchao\app\api\controller\express\OrderPrice;
  use addon\fengchao\app\model\order\Orderle;
  use addon\fengchao\app\service\api\marketing\pointexchange\OrderCreateService;
+ use addon\fengchao\app\service\lark\Lark;
+ use addon\fengchao\app\service\lark\LarkService;
  use app\service\api\sys\ConfigService;
  use core\base\BaseApiController;
 use think\facade\Log;
@@ -21,23 +23,19 @@ class Dev extends BaseApiController
     public function  domain()
     {
 
-        $model=new Orderle();
-        $data['create_time'] = time();
-        $data['order_code'] = time();
-        $data['site_id'] = time();
-        $data['kdn_code'] = time();
-        $data['server_data'] =[];
-        $data['price_data'] =[];
-        $data['result_price'] =[];
-        $data['user_price'] =[];
-        $data['client_data'] = [
-            "a"=>"中国"
-        ];
-       // $res = $model->save($data);
-        // echo $url;
-        var_dump($res);
 
-        exit;
+
+        try {
+            $lark = new LarkService();
+            $notify=$lark->useBotChat();
+            $notify->sendInfoNotification("info","ok",["a"=>1]);
+
+
+            return  33;
+        } catch (\Exception $e) {
+            return json(['error' => $e->getMessage()]);
+        }
+
 
        // return success($msg = 'SUCCESS', json_encode($result));
 

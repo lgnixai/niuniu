@@ -58,11 +58,8 @@ Route::group('express', function() {
 
 
 
+Route::group('test', function() {
 
+    Route::post('lark', 'addon\fengchao\app\api\controller\client\Dev@domain');
 
-//测试用
-Route::group('dev', function() {
-
-    Route::get('domain', 'addon\fengchao\app\api\controller\test\Dev@domain');
-    Route::get('test', 'addon\fengchao\app\api\controller\express\Order@test');
 });

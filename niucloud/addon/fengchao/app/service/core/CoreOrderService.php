@@ -241,7 +241,6 @@ class CoreOrderService extends BaseApiService
 
             $pay_data = [
                 "order_id" => $order_id,
-                "site_id" => $this->site_id,
                 "trade_type" => 2,
                 "money" => $pay_info["money"],
                 "status" => PayDict::STATUS_WAIT,
@@ -288,11 +287,7 @@ class CoreOrderService extends BaseApiService
                 ->where([['order_id', '=', $order_id]])->find( );
             if (empty($odi))
                 throw new CommonException('订单获取失败');
-//            $odi["order_id"]=$order_id;
-//            $odi["order_status"]=$state;
-//            $odi["order_status_desc"]=$data["Reason"];
-//            $odi["logistic_order_code"]=$data["LogisticCode"]??"";
-//            $odi["picker_info"]=$data["PickerInfo"]??"{}";
+
             $odi->order_status=$state;
             $odi->order_status_desc=$data["Reason"];
             $odi->logistic_order_code=$data["LogisticCode"]??"";

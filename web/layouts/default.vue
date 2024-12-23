@@ -1,11 +1,11 @@
 <template>
     <el-container class="w-screen h-screen">
         <el-header class="shadow z-1">
-            <layout-header />
+<!--            <layout-header />-->
         </el-header>
         <el-main class="p-0 min-w-[1200px]">
             <slot></slot>
-            <layout-footer />
+<!--            <layout-footer />-->
         </el-main>
     </el-container>
 </template>

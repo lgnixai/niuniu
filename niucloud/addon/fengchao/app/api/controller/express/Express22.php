@@ -180,7 +180,7 @@ class Express22 extends BaseApiController
         (new CoreOrderService())->NotifyOrder($res_data);
         Log::write('订单回调完成' . json_encode($data,JSON_UNESCAPED_UNICODE));
 
-
+        Log::notice();
     }
 
 

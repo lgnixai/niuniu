@@ -23,7 +23,7 @@ class Order extends BaseValidate
 
     protected $rule = [
         'EBusinessID' => 'require',
-        'RequestData' => 'require|isJson',
+        'RequestData' => 'require',
         'RequestType' => 'require',
         'DataType' => 'require',
         'DataSign' => 'require',

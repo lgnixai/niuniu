@@ -55,10 +55,14 @@ class Express extends BaseApiController
             ["ApiKey", ""],
             ["callback_url", ""],
         ]);
+
+        Log::write('接口请求参数('.$data['RequestType'].')' . json_encode($data));
+
         $this->validate($data, 'addon\fengchao\app\validate\express\Order.auth');
 
 
-        $requestData = $data['RequestData'];
+        $requestData =urldecode( $data['RequestData']);
+        Log::write('接口请求' . json_encode($requestData));
 
         $datas = array(
 
@@ -95,13 +99,17 @@ class Express extends BaseApiController
                 }
                 break;
             case "1815":
+                Log::write('请求 1815 报价' . json_encode($requestData));
+
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1815');
 
                 $res=(new CoreOrderService())->preOrder($res_data);
+
+                $event_data["response"]=$res;
                 $result=[];
                 $result["EBusinessID"]=$data['EBusinessID'];
                 $result["Data"]=$res;
-                $result["ResultCode"]="100";
+                $result["ResultCode"]=100;
                 $result["Reason"]="查询成功！";
                 $result["Success"]=true;
                 break;

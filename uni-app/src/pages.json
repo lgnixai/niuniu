@@ -311,6 +311,15 @@
 			"root": "addon",
 			"pages": [
 				// {{ PAGE_BEGAIN }}
+                // FCBOX_PAGE_BEGIN
+                // *********************************** hello world ***********************************
+                {
+                    "path": "fcbox/pages/hello_world/index",
+                    "style": {
+                        "navigationBarTitleText": "%fcbox.pages.hello_world.index%"
+                    }
+				},
+                // FCBOX_PAGE_END
         // TK_JHKD_PAGE_BEGIN
 			// *********************************** 聚合快递 ***********************************
 			{

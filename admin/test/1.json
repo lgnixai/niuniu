@@ -1,76 +1,30 @@
 {
-  "KdnOrderCode": "KDN2412181510003337",
-  "EBusinessID": 100005313534,
-  "Data": [
+  "InsureAmount": 1000,
+  "ShipperCode": "JD",
+  "OrderCode": "yfftest20220609111",
+  "Receiver": {
+    "ProvinceName": "广东省",
+    "Address": "暄悦东街 19-21-23 号保利中悦广场 18 楼",
+    "CityName": "广州市",
+    "ExpAreaName": "海珠区",
+    "Mobile": "15603003393",
+    "Name": "华珊"
+  },
+  "Quantity": 1,
+  "PayType": 3,
+  "Sender": {
+    "ProvinceName": "广东省",
+    "Address": "金花路华宝大厦 A 栋 601",
+    "CityName": "深圳市",
+    "ExpAreaName": "福田",
+    "Mobile": "18974122131",
+    "Name": "颜芬芬"
+  },
+  "ExpType": "",
+  "Commodity": [
     {
-      "100": {
-        "perationCode": "1872714",
-        "pushTime": "2024-12-18 15:57:42",
-        "logisticCode": "312583297972525",
-        "shipperCode": "YD"
-      }
-    },
-    {
-      "301": {
-        "perationCode": "YD",
-        "reason": "已揽件",
-        "overFee": null,
-        "cost": "6.45",
-        "ContinuousWeightAmount": "1.35",
-        "otherFee": "0.00",
-        "weight": 2,
-        "FirstWeightAmount": "5.10",
-        "volumeWeight": "0.00",
-        "shipperCode": "YD",
-        "volume": "0.00",
-        "insureAmount": null,
-        "otherFeeDetail": "{}",
-        "totalFee": 6.45,
-        "pickupCode": "1418",
-        "pushTime": "2024-12-18 22:05:11",
-        "logisticCode": "312583297972525",
-        "packageFee": "0.00"
-      }
-    },
-    {
-      "103": {
-        "personName": "刘万福",
-        "perationCode": "YD",
-        "reason": "订单已分配快递员",
-        "pickupCode": "1418",
-        "pushTime": "2024-12-18 16:05:37",
-        "personTel": "17881962952",
-        "logisticCode": "312583297972525",
-        "personCode": null,
-        "shipperCode": "YD"
-      }
-    },
-    {
-      "102": {
-        "perationCode": "YD",
-        "reason": "订单已分配快递员",
-        "stationCode": null,
-        "stationTel": null,
-        "pickupCode": "1418",
-        "stationName": null,
-        "pushTime": "2024-12-18 16:05:37",
-        "logisticCode": "312583297972525",
-        "stationAddress": null,
-        "shipperCode": "YD"
-      }
-    },
-    {
-      "2": {
-        "perationCode": "YD",
-        "reason": "【深圳市】已到达 广东深圳分拨交付中心",
-        "pushTime": "2024-12-19 02:26:02",
-        "logisticCode": "312583297972525",
-        "shipperCode": "YD"
-      }
+      "Goodsquantity": 1,
+      "GoodsName": "工牌"
     }
-  ],
-  "UniquerRequestNumber": "b7aa0082-e51b-42ff-8a4c-dfffa5a5ce14",
-  "ResultCode": "100",
-  "Reason": "查询成功！",
-  "Success": true
+  ]
 }

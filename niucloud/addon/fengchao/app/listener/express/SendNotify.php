@@ -61,7 +61,7 @@ class SendNotify
         Log::write('api_secret' . $api['api_secret']);
 
         Log::write('需要给队列发送的body' . json_encode($body["RequestData"], JSON_UNESCAPED_UNICODE));
-
+        $body["RequestData"]=( json_encode($body["RequestData"]));
         $body["DataSign"]= base64_encode(md5( json_encode($body["RequestData"]).$api['api_secret']));
 
         $body["RequestType"]= 103;
@@ -70,6 +70,7 @@ class SendNotify
 
         Log::write('需要给队列发送的' . json_encode($notify, JSON_UNESCAPED_UNICODE));
         $res= $this->execute($notify);
+        $res= $this->dev_execute($body);
         Log::write('发送给下游客户' . json_encode($res, JSON_UNESCAPED_UNICODE));
 
         $notify["body"]=json_encode($body, JSON_UNESCAPED_UNICODE);
@@ -81,8 +82,33 @@ class SendNotify
     public function execute($body)
     {
         $timestamp = (string)intval(microtime((bool)1) * 1000);
-       // $url="http://127.0.0.1:8888/api/client/callback";
+         $url="http://127.0.0.1:8888/api/client/callback";
         $url="https://weidanyun-gpo-weidanyun-xuwjswesde.cn-shenzhen.fcapp.run/fengchao/notify";
+        $header = ["Content-Type: application/json;charset=UTF-8"];
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body, JSON_UNESCAPED_UNICODE));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        $result = curl_exec($curl);
+        $err = curl_error($curl);
+
+      //  Log::write('发送给下游客户' . json_encode($result, JSON_UNESCAPED_UNICODE));
+
+        curl_close($curl);
+        if ($err) {
+            throw new Exception($err);
+        } else {
+            return json_decode($result, true);
+        }
+    } public function dev_execute($body)
+    {
+        $timestamp = (string)intval(microtime((bool)1) * 1000);
+         $url="http://127.0.0.1:8888/api/client/callback";
+        $url="http://kd.fengchao100.com:8888/api/tk_jhkd/kdniaonotice";
         $header = ["Content-Type: application/json;charset=UTF-8"];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);

@@ -59,6 +59,7 @@ class ExpressService extends BaseApiService
         $datas['DataSign'] = $this->encrypt($request_data, $AppKey);
 
 
+        Log::write("向快递鸟下单的数据 完整 ---".json_encode($datas).'---'.date("Y-m-d H:i:s").'------');
         Log::write("向快递鸟下单的数据---".$request_data.'---'.date("Y-m-d H:i:s").'------');
 
         //以form表单形式提交post请求，post请求体中包含了应用级参数和系统级参数
