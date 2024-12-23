@@ -20,9 +20,9 @@ class DeliveryDict
                 "url"=> "http://183.62.170.46:8081/api/dist"
             ],
             self::YUNJIE => [
-                'key'=>25531,
-                "secret"=>"OGZiMjhmNDFkNTExMGMzNzNlNzI5NzY1NTdjZTM2YTk",
-                "url"=> "https://open.yuntongzy.com/express/api/OrderService"
+                'key'=>25532,
+                "secret"=>"OGZIiMjhmNDFkNTExMGMzNzNlNzI5NzY1NTdjZTM2YTk",
+                "url"=> ""
             ],
         ];
     }
