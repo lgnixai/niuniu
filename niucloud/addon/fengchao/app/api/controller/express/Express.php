@@ -21,7 +21,6 @@ class Express extends BaseApiController
 {
 
 
-
     //快递鸟接口
     public function order()
     {
@@ -67,8 +66,8 @@ class Express extends BaseApiController
             case "1801":
 
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
-                $order_id = event('CreateOrder', ['site_id'=>$this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
-                $order_id=$order_id[0];
+                $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
+                $order_id = $order_id[0];
                 Log::write('快递鸟下单接口3333' . json_encode($order_id));
 
                 $res = (new CoreOrderService())->checkBalance($res_data);
@@ -84,10 +83,9 @@ class Express extends BaseApiController
                         event('AfterOrderCreate', ($result));
 
 
-
                         Log::write('快递鸟下单接口4444' . json_encode($result));
 
-                        $result['Order']['OrderCode']=$res_data["OrderCode"];
+                        $result['Order']['OrderCode'] = $res_data["OrderCode"];
                     }
 
                     $result["Reason"] = "平台已接单";
@@ -113,13 +111,20 @@ class Express extends BaseApiController
             case "1802":
                 //取消订单
                 Log::write('请求 1802 报价' . json_encode($requestData));
-
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
-
-
                 $result = (new CoreOrderService())->CancelOrder($res_data);
-               // $result["EBusinessID"] = $data['EBusinessID'];
-
+                break;
+            case "1804":
+                //查询订单
+                Log::write('请求 1804 查询订单' . json_encode($requestData));
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
+                $result = (new CoreOrderService())->ViewOrder($res_data);
+                break;
+            case "1816":
+                //轨迹查询订单
+                Log::write('请求 1816 轨迹查询订单' . json_encode($requestData));
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
+                $result = (new CoreOrderService())->RouteOrder($res_data);
                 break;
             default:
                 $result = (new ExpressService())->Kdniao($datas);

@@ -34,4 +34,6 @@ abstract class BaseDelivery extends Storage
     abstract protected function getBalance();
     //查询物流轨迹
     abstract protected function deliveryTrance($params);
+    abstract protected function viewOrder($params);
+    abstract protected function routeOrder($params);
 }

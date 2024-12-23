@@ -98,6 +98,54 @@ class CoreOrderService extends BaseApiService
             throw new CommonException($e->getMessage());
         }
     }
+
+    //查看订单
+    public function  ViewOrder($data)
+    {
+        Db::startTrans();
+        try {
+
+            $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
+
+            $res=event('DeliveryViewOrder', ['site_id' => $this->site_id, 'data' => [
+                'order_id'=>$order['order_id'],
+                'service_order_code'=>$order['service_order_code'],
+                'client_order_code'=>$order['client_order_code'],
+                'platform' => 'kdniao',
+            ]]);
+            Db::commit();
+            return $res[0];
+        } catch (Exception $e) {
+            Db::rollback();
+            Log::write('===聚合快递退款失败===' . date('Y-m-d H:i:s'));
+            Log::write($e->getMessage());
+            throw new CommonException($e->getMessage());
+        }
+    }
+    //订单路由轨迹
+    public function  RouteOrder($data)
+    {
+        Db::startTrans();
+        try {
+
+            $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
+
+            $res=event('DeliveryRouteOrder', ['site_id' => $this->site_id, 'data' => [
+                'order_id'=>$order['order_id'],
+                'service_order_code'=>$order['service_order_code'],
+                'client_order_code'=>$order['client_order_code'],
+                'platform' => 'kdniao',
+            ]]);
+
+            Db::commit();
+            return $res[0];
+        } catch (Exception $e) {
+            Db::rollback();
+            Log::write('===聚合快递退款失败===' . date('Y-m-d H:i:s'));
+            Log::write($e->getMessage());
+            throw new CommonException($e->getMessage());
+        }
+    }
     //下单
     public function createOrder($data)
     {

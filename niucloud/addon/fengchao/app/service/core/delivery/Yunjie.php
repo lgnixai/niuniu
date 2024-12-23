@@ -42,11 +42,11 @@ class Yunjie extends BaseDelivery
             'TransportType' => 1,
             'ShipperType' => 5,
             'Weight' => $params['Weight'],
-            'InsureAmount' => $params['InsureAmount']??0,
+            'InsureAmount' => $params['InsureAmount'] ?? 0,
             'Receiver' => [
                 'Name' => $params['Receiver']['Name'] ?? '张三',
                 'Mobile' => $params['Receiver']['Mobile'] ?? '13888888888',
-                'Tel' => $params['Receiver']['Tel']??'',
+                'Tel' => $params['Receiver']['Tel'] ?? '',
                 'ProvinceName' => $params['Receiver']['ProvinceName'],
                 'CityName' => $params['Receiver']['CityName'],
                 'ExpAreaName' => $params['Receiver']['ExpAreaName'],
@@ -55,7 +55,7 @@ class Yunjie extends BaseDelivery
             'Sender' => [
                 'Name' => $params['Sender']['Name'] ?? '李四',
                 'Mobile' => $params['Sender']['Mobile'] ?? '13888888888',
-                'Tel' => $params['Sender']['Tel']??'',
+                'Tel' => $params['Sender']['Tel'] ?? '',
                 'ProvinceName' => $params['Sender']['ProvinceName'],
                 'CityName' => $params['Sender']['CityName'],
                 'ExpAreaName' => $params['Sender']['ExpAreaName'],
@@ -71,30 +71,30 @@ class Yunjie extends BaseDelivery
         $callbackData = [];
         $resInfo = $resInfo['data'];
 
-        $item=[];
+        $item = [];
 
-        $item["weight"]=$params['Weight'];
-        $item["shipperCode"]="JD";
+        $item["weight"] = $params['Weight'];
+        $item["shipperCode"] = "JD";
 
-        $item["firstWeight"]=$resInfo['upperGround'];
-        $item["firstWeightAmount"]=$resInfo['groundPrice'];
-        $item["continuousWeight"]=0;
-        $item["continuousWeightPrice"]=$resInfo['rateOfStage'];
-        $item["continuousWeightAmount"]=$resInfo['rateOfStage'];
-        $item["cost"]=$resInfo['totalfee'];
-        $item["isSubsectionContinuousWeightPrice"]=0;
-        $item["totalFee"]=$resInfo['discountfee'];
-        $item["price"]=[
-            "calcFeeType"=>'discount',
-            "perAdd"=>0,
-            "cost"=>$resInfo['totalfee'],
-            "discount"=>$resInfo['discount'],
-            "discountfee"=>$resInfo['discountfee'],
+        $item["firstWeight"] = $resInfo['upperGround'];
+        $item["firstWeightAmount"] = $resInfo['groundPrice'];
+        $item["continuousWeight"] = 0;
+        $item["continuousWeightPrice"] = $resInfo['rateOfStage'];
+        $item["continuousWeightAmount"] = $resInfo['rateOfStage'];
+        $item["cost"] = $resInfo['totalfee'];
+        $item["isSubsectionContinuousWeightPrice"] = 0;
+        $item["totalFee"] = $resInfo['discountfee'];
+        $item["price"] = [
+            "calcFeeType" => 'discount',
+            "perAdd" => 0,
+            "cost" => $resInfo['totalfee'],
+            "discount" => $resInfo['discount'],
+            "discountfee" => $resInfo['discountfee'],
         ];
-        $item["insureAmount"]=$resInfo['InsureAmount']??0;
-        $item["premiumFee"]=$resInfo['InsureValue']??0;
+        $item["insureAmount"] = $resInfo['InsureAmount'] ?? 0;
+        $item["premiumFee"] = $resInfo['InsureValue'] ?? 0;
 
-        $callbackData[]=$item;
+        $callbackData[] = $item;
         return $callbackData;
     }
 
@@ -172,6 +172,34 @@ class Yunjie extends BaseDelivery
      * author:TK
      */
     public function cancelOrder($data)
+    {
+        $params = [
+            "OrderCode" => $data['order_id'],
+        ];
+        $resInfo = $this->execute('1802', $params);
+        $resInfo['data'] = $resInfo['ResultCode'];
+        $resInfo['msg'] = $resInfo['Reason'];
+        if ($resInfo['ResultCode'] == 100) {
+            $resInfo['code'] = 200;
+        }
+        return $resInfo ?? '';
+    }
+
+    public function viewOrder($data)
+    {
+        $params = [
+            "OrderCode" => $data['order_id'],
+        ];
+        $resInfo = $this->execute('1802', $params);
+        $resInfo['data'] = $resInfo['ResultCode'];
+        $resInfo['msg'] = $resInfo['Reason'];
+        if ($resInfo['ResultCode'] == 100) {
+            $resInfo['code'] = 200;
+        }
+        return $resInfo ?? '';
+    }
+
+    public function routeOrder($data)
     {
         $params = [
             "OrderCode" => $data['order_id'],

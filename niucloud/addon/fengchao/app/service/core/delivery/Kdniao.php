@@ -126,6 +126,29 @@ class Kdniao extends BaseDelivery
 //        $resInfo['msg'] = $resInfo['Reason'];
         return $resInfo ?? '';
     }
+    public function viewOrder($data)
+    {
+
+        $params = [
+            "OrderCode" => $data['order_id'],
+        ];
+        $resInfo = $this->execute('1804', $params);
+
+        return $resInfo ?? '';
+    }
+
+
+    public function routeOrder($data)
+    {
+
+        $params = [
+            "KdnOrderCode" => $data['service_order_code'],
+        ];
+        $resInfo = $this->execute('1816', $params);
+//        $resInfo['data'] = $resInfo['ResultCode'];
+//        $resInfo['msg'] = $resInfo['Reason'];
+        return $resInfo ?? '';
+    }
 
     /**
      * @Notes:轨迹查询

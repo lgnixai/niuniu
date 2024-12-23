@@ -73,6 +73,10 @@ return [
         //取消下单--封装接口
         "DeliveryCancelOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryCancelOrderListener'],
 
+        "DeliveryViewOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryViewOrderListener'],
+
+        "DeliveryRouteOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryRouteOrderListener'],
+
         'JhkdPlatformType' => ['addon\fengchao\app\listener\platform\PlatformListener'],
 
 
