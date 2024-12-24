@@ -68,30 +68,38 @@ class Express extends BaseApiController
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
                 $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
                 $order_id = $order_id[0];
-                Log::write('快递鸟下单接口3333' . json_encode($order_id));
-
-                $res = (new CoreOrderService())->checkBalance($res_data);
-                if ($res) {
-                    $temp_order = $res_data;
-                    $temp_order["OrderCode"] = $order_id;
-                    $datas['RequestData'] = json_encode($temp_order, JSON_UNESCAPED_UNICODE);
-                    $result = (new ExpressService())->Kdniao($datas);
-                    if ($result["Success"]) {
-                        $res_data["result"] = $result["Order"];
-                        $res_data["order_id"] = $order_id;
-                        $res = (new CoreOrderService())->createOrder($res_data);
-                        event('AfterOrderCreate', ($result));
+                $res_data["order_id"] = $order_id;
+                Log::write('1801下单接口' . json_encode($res_data));
+                $result = (new CoreOrderService())->CreateOrder($res_data);
+                $result=$result['result'];
+                Log::write('1801下单接口' . json_encode($result));
 
 
-                        Log::write('快递鸟下单接口4444' . json_encode($result));
 
-                        $result['Order']['OrderCode'] = $res_data["OrderCode"];
-                    }
 
-                    $result["Reason"] = "平台已接单";
-                    $event_data["response"] = $result;
-                    Log::write('快递鸟下单接口' . json_encode($result));
-                }
+//
+//                $res = (new CoreOrderService())->checkBalance($res_data);
+//                if ($res) {
+//                    $temp_order = $res_data;
+//                    $temp_order["OrderCode"] = $order_id;
+//                    $datas['RequestData'] = json_encode($temp_order, JSON_UNESCAPED_UNICODE);
+//                    $result = (new ExpressService())->Kdniao($datas);
+//                    if ($result["Success"]) {
+//                        $res_data["result"] = $result["Order"];
+//                        $res_data["order_id"] = $order_id;
+//                        $res = (new CoreOrderService())->createOrder($res_data);
+//                        event('AfterOrderCreate', ($result));
+//
+//
+//                        Log::write('快递鸟下单接口4444' . json_encode($result));
+//
+//                        $result['Order']['OrderCode'] = $res_data["OrderCode"];
+//                    }
+//
+//                    $result["Reason"] = "平台已接单";
+//                    $event_data["response"] = $result;
+//                    Log::write('快递鸟下单接口' . json_encode($result));
+//                }
                 break;
             case "1815":
                 //询价
@@ -119,6 +127,18 @@ class Express extends BaseApiController
                 Log::write('请求 1804 查询订单' . json_encode($requestData));
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
                 $result = (new CoreOrderService())->ViewOrder($res_data);
+                break;
+            case "1807":
+                //查询订单
+                Log::write('请求 1807 工单订单' . json_encode($requestData));
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
+                $result = (new CoreOrderService())->ComplaintOrder($res_data);
+                break;
+            case "1818":
+                //查询订单
+                Log::write('请求 1807 工单订单' . json_encode($requestData));
+                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
+                $result = (new CoreOrderService())->ComplaintViewOrder($res_data);
                 break;
             case "1816":
                 //轨迹查询订单

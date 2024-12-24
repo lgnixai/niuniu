@@ -213,6 +213,34 @@ class Yunjie extends BaseDelivery
         return $resInfo ?? '';
     }
 
+    public function complaintOrder($data)
+    {
+        $params = [
+            "OrderCode" => $data['order_id'],
+        ];
+        $resInfo = $this->execute('1802', $params);
+        $resInfo['data'] = $resInfo['ResultCode'];
+        $resInfo['msg'] = $resInfo['Reason'];
+        if ($resInfo['ResultCode'] == 100) {
+            $resInfo['code'] = 200;
+        }
+        return $resInfo ?? '';
+    }
+
+    public function complaintViewOrder($data)
+    {
+        $params = [
+            "OrderCode" => $data['order_id'],
+        ];
+        $resInfo = $this->execute('1802', $params);
+        $resInfo['data'] = $resInfo['ResultCode'];
+        $resInfo['msg'] = $resInfo['Reason'];
+        if ($resInfo['ResultCode'] == 100) {
+            $resInfo['code'] = 200;
+        }
+        return $resInfo ?? '';
+    }
+
     /**
      * @Notes:轨迹查询
      * deliveryTrance

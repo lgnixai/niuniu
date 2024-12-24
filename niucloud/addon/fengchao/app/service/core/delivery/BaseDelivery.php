@@ -36,4 +36,6 @@ abstract class BaseDelivery extends Storage
     abstract protected function deliveryTrance($params);
     abstract protected function viewOrder($params);
     abstract protected function routeOrder($params);
+    abstract protected function complaintOrder($params);
+    abstract protected function complaintViewOrder($params);
 }

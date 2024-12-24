@@ -117,6 +117,14 @@ class Kdn extends BaseValidate
         "1802" => [
                 "OrderCode",
             ],
+        "1807" => [
+            "Mobile",
+            "Name",
+            "ComplaintType",
+            "OrderCode",
+            "ComplaintContent",
+            "Source",
+        ],
         "1815"=> [
             "TransportType",
             "ShipperType",

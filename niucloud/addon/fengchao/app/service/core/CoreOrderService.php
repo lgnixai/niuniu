@@ -81,13 +81,19 @@ class CoreOrderService extends BaseApiService
         Db::startTrans();
         try {
 
-            $client_id= (new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+            $order_id= (new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
 
             $res=event('DeliveryCancelOrder', ['site_id' => $this->site_id, 'data' => [
 
-                'order_id' => $client_id,
+                'order_id' => $order_id,
                 'platform' => 'kdniao',
             ]]);
+
+
+            event('CancelOrder', [
+                'id' => $order_id,
+                'close_reason' => "用户主动退款",
+            ]);
 
             Db::commit();
             return $res[0];
@@ -122,6 +128,53 @@ class CoreOrderService extends BaseApiService
             throw new CommonException($e->getMessage());
         }
     }
+    //工单投诉
+    public function  ComplaintOrder($data)
+    {
+        Db::startTrans();
+        try {
+
+            $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
+            $arr=array_merge($data,[
+                'order_id'=>$order['order_id'],
+                'service_order_code'=>$order['service_order_code'],
+                'client_order_code'=>$order['client_order_code'],
+                'platform' => 'kdniao',
+            ]);
+
+            $res=event('DeliveryComplaintOrder', ['site_id' => $this->site_id, 'data' =>$arr]);
+            Db::commit();
+            return $res[0];
+        } catch (Exception $e) {
+            Db::rollback();
+            Log::write('===聚合快递退款失败===' . date('Y-m-d H:i:s'));
+            Log::write($e->getMessage());
+            throw new CommonException($e->getMessage());
+        }
+    }
+    public function  ComplaintViewOrder($data)
+    {
+        Db::startTrans();
+        try {
+
+            $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
+            $arr=array_merge($data,[
+                'order_id'=>$order['order_id'],
+                'service_order_code'=>$order['service_order_code'],
+                'client_order_code'=>$order['client_order_code'],
+                'platform' => 'kdniao',
+            ]);
+
+            $res=event('DeliveryComplaintViewOrder', ['site_id' => $this->site_id, 'data' =>$arr]);
+            Db::commit();
+            return $res[0];
+        } catch (Exception $e) {
+            Db::rollback();
+            Log::write('===聚合快递退款失败===' . date('Y-m-d H:i:s'));
+            Log::write($e->getMessage());
+            throw new CommonException($e->getMessage());
+        }
+    }
     //订单路由轨迹
     public function  RouteOrder($data)
     {
@@ -147,7 +200,7 @@ class CoreOrderService extends BaseApiService
         }
     }
     //下单
-    public function createOrder($data)
+    public function CreateOrder($data)
     {
 
         Log::write("下单---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
@@ -155,7 +208,23 @@ class CoreOrderService extends BaseApiService
         try {
             Db::startTrans();
 
-            $linePrice=(new LinePriceService())->getOrderLinePrice($data);
+            $data['platform'] ='kdniao';
+
+            $submitInfo = event('DeliverySendOrder', ['site_id' => $this->site_id, 'data' => $data]);
+            $submitInfo = $submitInfo [0];
+
+            Log::write("下单33---".json_encode($submitInfo,true).'---'.date("Y-m-d H:i:s").'------');
+
+
+           $priceInfo = event('CalcPriceOrder', ['site_id' => $this->site_id, 'data' => $data]);
+           $priceInfo= $priceInfo [0];
+           Log::write("下单44---".json_encode($priceInfo,true).'---'.date("Y-m-d H:i:s").'------');
+
+          // exit;
+//
+//
+//            exit;
+//            $linePrice=(new LinePriceService())->getOrderLinePrice($data);
 
 //            $order = [
 //                "site_id" => $this->site_id,
@@ -167,10 +236,10 @@ class CoreOrderService extends BaseApiService
             $order_delivery = [
                 "site_id" => $this->site_id,
                 "app_id" => $this->member_id,
-                "order_id" => $data['order_id'],
-                "line_price_id" => $linePrice["id"],
-                "client_order_code" => $data["OrderCode"],
-                "service_order_code" => $data["result"]["KDNOrderCode"],
+                "order_id" => $submitInfo['order_id'],
+                "line_price_id" => 1,
+                "client_order_code" => $submitInfo["client_order_code"],
+                "service_order_code" => $submitInfo["service_order_code"],
                 "order_info"=>$data
             ];
 
@@ -181,15 +250,16 @@ class CoreOrderService extends BaseApiService
                 "order_id" => $data["order_id"],
                 "site_id" => $this->site_id,
                 "trade_type" => 1,
-                "money" => $linePrice["totalFee"],
+                "money" => $priceInfo['totalFee'],
                 "status" => PayDict::STATUS_WAIT,
             ];
             $this->payModel->save($pay_data);
             $pay_data['pay_id']=$this->payModel->id;
             $pay_data['memo']="下单预扣费";
+
             event('PayCreate', $pay_data);
             Db::commit();
-            return true;
+            return $submitInfo;
         } catch (Exception $e) {
             Db::rollback();
             Log::write('下单失败' . date('Y-m-d H:i:s'));
@@ -280,16 +350,15 @@ class CoreOrderService extends BaseApiService
 
         return true;
     }
-//回调
+
+    //退款
     public function RefundOrder($data)
     {
 
         Log::write("回调---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
-        $order_id=$data["OrderCode"];
-        $client_id= (new OrderDeliveryService())->getClientIdById($data["OrderCode"]);
+        $order_id=$data["id"];
+        $reason=$data["close_reason"];
 
-        $server_order_id=$data["KDNOrderCode"];
-        $state=$data["State"];
         try {
             Db::startTrans();
             //检查是否已经退过款
@@ -318,7 +387,7 @@ class CoreOrderService extends BaseApiService
             ];
             $this->payModel->save($pay_data);
             $pay_data['pay_id']=$this->payModel->id;
-            $pay_data['memo']="取消订单退款";
+            $pay_data['memo']=$reason;
 
             event('PayCreate', $pay_data);
 

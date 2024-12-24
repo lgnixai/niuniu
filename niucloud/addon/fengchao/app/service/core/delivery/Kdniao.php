@@ -35,10 +35,10 @@ class Kdniao extends BaseDelivery
      * 2024/12/12  08:33
      * author:TK
      */
-    public function preOrder($params)
+    public function preOrder($data)
     {
 
-        $callbackData = (new LinePriceService())->getLinePrice($params);
+        $callbackData = (new LinePriceService())->getLinePrice($data);
         return $callbackData;
     }
 
@@ -52,42 +52,8 @@ class Kdniao extends BaseDelivery
     public function sendOrder($params)
     {
 
-        $data = [
-            'ShipperCode' => $params['deliveryType'],//注意指定权限
-            'TransportType' => 1,
-            'ShipperType' => 5,
-            'OrderCode' => $params['thirdNo'],
-            'ExpType' => 1,
-            'PayType' => 3,
-            'Sender' => [
-                'Name' => $params['senderName'],
-                'Mobile' => $params['senderMobile'],
-                'ProvinceName' => $params['senderProvince'],
-                'CityName' => $params['senderCity'],
-                'ExpAreaName' => $params['senderDistrict'],
-                'Address' => $params['senderAddress'],
-            ],
-            'Receiver' => [
-                'Name' => $params['receiveName'],
-                'Mobile' => $params['receiveMobile'],
-                'ProvinceName' => $params['receiveProvince'],
-                'CityName' => $params['receiveCity'],
-                'ExpAreaName' => $params['receiveDistrict'],
-                'Address' => $params['receiveAddress'],
-            ],
-            'Weight' => $params['weight'],
-            'Quantity' => $params['packageCount'],
-            'Volume' => (int)$params['vloumLong'] * $params['vloumWidth'] * $params['vloumHeight'],
-            'Remark' => $params['remark'],
-            'Commodity' => [
-                [
-                    'GoodsName' => $params['goods'],
-                    'GoodsQuantity' => $params['packageCount'],
-                    'GoodsPrice' => $params['guaranteeValueAmount'],
-                ]
-            ],
-            'InsureAmount' => $params['guaranteeValueAmount'],
-        ];
+        $data=$params;
+        $data["OrderCode"]=$params["order_id"];
         $resInfo = $this->execute('1801', $data);
 
         Log::write('快递鸟下单发送数据333：' . json_encode($resInfo));
@@ -95,10 +61,13 @@ class Kdniao extends BaseDelivery
             Log::write('提交运单失败：kdniao_error--' . $resInfo['Reason']);
             return ['type' => 'error', 'msg' => $resInfo['Reason'] ?? 'kdniao三方平台下单失败，请重新下单！'];
         }
-
+        $resInfo['Order']['OrderCode']=$params["OrderCode"];
+        $resInfo["Reason"] = "平台已接单";
         $res = [
-            'orderNo' => $resInfo['Order']['KDNOrderCode'],
-            'deliveryId' => '',
+            'service_order_code' => $resInfo['Order']['KDNOrderCode'],
+            'client_order_code' => $params["OrderCode"],
+            'order_id' => $params["order_id"],
+            'result'=>$resInfo
         ];
         return $res;
     }
@@ -126,6 +95,7 @@ class Kdniao extends BaseDelivery
 //        $resInfo['msg'] = $resInfo['Reason'];
         return $resInfo ?? '';
     }
+
     public function viewOrder($data)
     {
 
@@ -147,6 +117,26 @@ class Kdniao extends BaseDelivery
         $resInfo = $this->execute('1816', $params);
 //        $resInfo['data'] = $resInfo['ResultCode'];
 //        $resInfo['msg'] = $resInfo['Reason'];
+        return $resInfo ?? '';
+    }
+
+    public function complaintOrder($data)
+    {
+
+        $params = $data;
+        $params["OrderCode"]=$data["order_id"];
+        $resInfo = $this->execute('1807', $params);
+
+        return $resInfo ?? '';
+    }
+
+    public function complaintViewOrder($data)
+    {
+        $params = [
+            "kdnOrderCodes" => [$data['service_order_code']],
+        ];
+        $resInfo = $this->execute('1818', $params);
+
         return $resInfo ?? '';
     }
 
@@ -203,6 +193,8 @@ class Kdniao extends BaseDelivery
         $business_id = $this->config['business_id'];
         $api_key = $this->config['api_key'];
         $requestData = json_encode($requestData);
+        Log::write('快递鸟预下单发送数据1：' . $requestData);
+
         $datas = array(
             'EBusinessID' => $business_id,
             'RequestType' => $type,
@@ -211,7 +203,7 @@ class Kdniao extends BaseDelivery
         );
         $datas['DataSign'] = $this->encrypt($requestData, $api_key);
 
-        Log::write('快递鸟预下单发送数据：' . $type . ':' . json_encode($datas));
+        Log::write('快递鸟预下单发送数据2：' . $type . ':' . json_encode($datas));
         Log::write('快递鸟预下单发送数据：' . $url);
 
         $postdata = http_build_query($datas);

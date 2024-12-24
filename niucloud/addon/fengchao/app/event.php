@@ -70,12 +70,16 @@ return [
         "DeliveryPreOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryPreOrderListener'],
         //发送下单--封装接口
         "DeliverySendOrder"=>['addon\fengchao\app\listener\order\delivery\DeliverySendOrderListener'],
+        "CalcPriceOrder"=>['addon\fengchao\app\listener\order\delivery\CalcPriceOrderListener'],
         //取消下单--封装接口
         "DeliveryCancelOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryCancelOrderListener'],
 
         "DeliveryViewOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryViewOrderListener'],
 
         "DeliveryRouteOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryRouteOrderListener'],
+
+        "DeliveryComplaintOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryComplaintOrderListener'],
+        "DeliveryComplaintViewOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryComplaintViewOrderListener'],
 
         'JhkdPlatformType' => ['addon\fengchao\app\listener\platform\PlatformListener'],
 
