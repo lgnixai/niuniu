@@ -49,6 +49,8 @@ Route::group('fengchao', function () {
 
     Route::post('line/price', 'addon\fengchao\app\adminapi\controller\site\LinePrice@add');
     Route::post('site/line/price', 'addon\fengchao\app\adminapi\controller\site\LinePrice@getBySiteId');
+    Route::post('site/discount/price', 'addon\fengchao\app\adminapi\controller\site\DiscountPrice@update');
+    Route::get('site/discount/price/:site_id', 'addon\fengchao\app\adminapi\controller\site\DiscountPrice@getBySiteId');
 
     Route::get('delivery/company/all', 'addon\fengchao\app\adminapi\controller\delivery\Company@all');
     Route::get('channel/all', 'addon\fengchao\app\adminapi\controller\site\Channel@all');

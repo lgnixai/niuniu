@@ -49,6 +49,13 @@ class SiteAuthService extends BaseAdminService
         return $res->id;
     }
 
+    public function edit( array $data)
+    {
+        $data[ 'update_time' ] = time();
+        $this->model->where([  [ 'site_id', '=', $this->site_id ] ])->update($data);
+        return true;
+    }
+
     public function getAllList(array $where = [], $field = 'id,api_key,api_secret,create_time')
     {
 

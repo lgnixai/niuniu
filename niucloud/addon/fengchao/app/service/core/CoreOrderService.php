@@ -207,6 +207,13 @@ class CoreOrderService extends BaseApiService
 
         try {
             Db::startTrans();
+            //第一步获取订单价格和渠道
+            $priceInfo = event('CalcPriceOrder', ['site_id' => $this->site_id, 'data' => $data]);
+            $priceInfo= $priceInfo [0];
+
+            Log::write("下单44---".json_encode($priceInfo,true).'---'.date("Y-m-d H:i:s").'------');
+
+            exit;
 
             $data['platform'] ='kdniao';
 
@@ -216,15 +223,13 @@ class CoreOrderService extends BaseApiService
             Log::write("下单33---".json_encode($submitInfo,true).'---'.date("Y-m-d H:i:s").'------');
 
 
-           $priceInfo = event('CalcPriceOrder', ['site_id' => $this->site_id, 'data' => $data]);
-           $priceInfo= $priceInfo [0];
-           Log::write("下单44---".json_encode($priceInfo,true).'---'.date("Y-m-d H:i:s").'------');
+
 
           // exit;
 //
 //
 //            exit;
-//            $linePrice=(new LinePriceService())->getOrderLinePrice($data);
+            $linePrice=(new LinePriceService())->getOrderLinePrice($data);
 
 //            $order = [
 //                "site_id" => $this->site_id,

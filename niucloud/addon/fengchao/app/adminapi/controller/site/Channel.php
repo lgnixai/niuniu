@@ -34,7 +34,8 @@ class Channel extends BaseAdminController
         $data=[
                ["code"=>"kdniao",
                 "name"=>"快递鸟",
-               ]
+               ],
+                ["code"=>"yunjie","name"=>"云杰"]
         ];
         return success($data);
     }

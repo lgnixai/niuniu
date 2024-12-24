@@ -8,7 +8,7 @@
 
       <el-tabs v-model="type">
         <el-tab-pane :label="t(tab)" v-for="(tab, index) in attachmentType" :name="tab" :key="index">
-          <attachment scene="attachment" :type="tab" />
+          <attachment scene="attachment" :type="tab"/>
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -24,7 +24,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const pageName = route.meta.title
-const attachmentType: string[] = ['快递鸟']
+const attachmentType: string[] = ['kdniao', 'yunjie']
 const type = ref(attachmentType[0])
 
 </script>

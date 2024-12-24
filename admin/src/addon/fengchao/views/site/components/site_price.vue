@@ -1,60 +1,65 @@
 <template>
-    <div class="flex border-t border-b main-wrap border-color w-full" :class="scene == 'select' ? 'h-[40vh]' : 'h-full'">
+  <div>
+    <div class="flex border-t border-b main-wrap border-color w-full" :class="scene == 'select' ? 'h-[40vh]' : 'h-full'"
+         v-if="prop.type == 'kdniao'">
 
-        <!-- 分组 -->
-        <div class="group-wrap w-[180px] p-[15px] h-full border-r border-color flex flex-col">
+      <!-- 分组 -->
+      <div class="group-wrap w-[180px] p-[15px] h-full border-r border-color flex flex-col">
 
-             <div class="group-list flex-1 my-[10px] h-0">
-                <el-scrollbar>
-                    <div class="group-item p-[10px] leading-none text-xs rounded cursor-pointer" :class="{ active: brandParam.express_no == 0 }" @click="brandParam.express_no = 0">
-                        {{ t('selectPlaceholder') }}
-                    </div>
-                    <div class="group-item px-[10px] text-xs rounded cursor-pointer flex"
-                        v-for="(item, index) in brandList.data" :key="index"
-                        :class="{ active: brandParam.express_no == item.express_no }">
-                        <div class="flex-1 leading-none truncate py-[10px]" @click="brandParam.express_no = item.express_no">{{ item.company_name }}</div>
-
-                    </div>
-                </el-scrollbar>
+        <div class="group-list flex-1 my-[10px] h-0">
+          <el-scrollbar>
+            <div class="group-item p-[10px] leading-none text-xs rounded cursor-pointer"
+                 :class="{ active: brandParam.express_no == 0 }" @click="brandParam.express_no = 0">
+              {{ t('selectPlaceholder') }}
             </div>
-
+            <div class="group-item px-[10px] text-xs rounded cursor-pointer flex"
+                 v-for="(item, index) in brandList.data" :key="index"
+                 :class="{ active: brandParam.express_no == item.express_no }">
+              <div class="flex-1 leading-none truncate py-[10px]" @click="brandParam.express_no = item.express_no">
+                {{ item.company_name }}
+              </div>
+            </div>
+          </el-scrollbar>
         </div>
 
-        <!-- 素材 -->
-        <div class="attachment-list-wrap flex flex-col p-[15px] flex-1 overflow-hidden">
-            <el-row :gutter="15" class="h-[32px]">
-                <el-col :span="10">
-                    <div class="flex">
-                             <el-button type="primary" @click="importEvent">导入价格</el-button>
-                         <div  >
-                             <el-button   class="ml-[10px]" type="primary" @click="checkPriceView">价格全览</el-button>
-                        </div>
-                    </div>
-                </el-col>
-<!--                <el-col :span="14" class="text-right">-->
-<!--                    <el-input v-model="brandParam.real_name" class="m-0 !w-[200px]" clearable :placeholder="t('upload.placeholder' + type + 'Name')" prefix-icon="Search" @input="getAttachmentList()" />-->
-<!--                </el-col>-->
-            </el-row>
-            <div class=" " v-loading="priceTable.loading">
+      </div>
 
-                  <div class="mt-[10px]  ">
-                    <el-scrollbar height="500px"  >
-
-                    <VisualGrid ref="visualGrid" :options="gridConfig" />
-                    </el-scrollbar>
-                  </div>
-                  <el-row :gutter="20">
-                    计录条数{{priceTable.total}}
-                  </el-row>
-
+      <!-- 素材 -->
+      <div class="attachment-list-wrap flex flex-col p-[15px] flex-1 overflow-hidden">
+        <el-row :gutter="15" class="h-[32px]">
+          <el-col :span="10">
+            <div class="flex">
+              <el-button type="primary" @click="importEvent">导入价格</el-button>
+              <div>
+                <el-button class="ml-[10px]" type="primary" @click="checkPriceView">价格全览</el-button>
+              </div>
             </div>
+          </el-col>
+        </el-row>
+        <div class=" ">
 
-          <price-view ref="priceViewDialog" @complete="loadOrderList" />
-          <import-price ref="importPriceDialog"   />
+          <div class="mt-[10px]  ">
+            <el-scrollbar height="500px">
+
+              <VisualGrid ref="visualGrid" :options="gridConfig"/>
+            </el-scrollbar>
+          </div>
+          <el-row :gutter="20">
+            计录条数{{ priceTable.total }}
+          </el-row>
 
         </div>
-
+        <price-view ref="priceViewDialog" @complete="loadOrderList"/>
+        <import-price ref="importPriceDialog"/>
+      </div>
     </div>
+    <div class="flex border-t border-b main-wrap border-color w-full" :class="scene == 'select' ? 'h-[40vh]' : 'h-full'"
+         v-if="prop.type == 'yunjie'">
+
+      <discount :siteId="priceTable.site_id"></discount>
+    </div>
+
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -62,7 +67,7 @@ import { ref, reactive, watch, computed, toRaw } from 'vue'
 import { t } from '@/lang'
 
 import { debounce, img, getToken } from '@/utils/common'
-import { ElMessage, UploadFile, UploadFiles, ElMessageBox, MessageParams } from 'element-plus'
+import { ElMessage, UploadFile, UploadFiles, ElMessageBox, MessageParams, FormInstance, FormRules } from 'element-plus'
 import storage from '@/utils/storage'
 import { getBrandAll, getLinePrice } from '@/addon/fengchao/api/site'
 import VisualGrid from '@/addon/fengchao/views/components/VisualGrid.vue'
@@ -70,6 +75,9 @@ import { GridOptions, RowData } from '@visualjs/grid'
 import { useRoute, useRouter } from 'vue-router'
 import PriceView from '@/addon/fengchao/views/site/components/price_view.vue'
 import ImportPrice from '@/addon/fengchao/views/site/components/import_price.vue'
+
+import discount from '@/addon/fengchao/views/site/components/discount.vue'
+
 const route = useRoute()
 const router = useRouter()
 const rows: RowData[] = []
@@ -89,14 +97,14 @@ const prop = defineProps({
     // 场景
     scene: {
         type: String,
-        default: 'select' // select 选择图片 attachment 素材中心
+        default: 'kdniao' // select 选择图片 attachment 素材中心
     }
 })
 
 // 选中的文件
 const selectedFile: Record<string, any> = reactive({})
 
-const selectedFileIndex:any = reactive([])
+const selectedFileIndex: any = reactive([])
 
 const brandList: Record<string, any> = reactive({
     data: []
@@ -190,14 +198,54 @@ loadOrderList()
 const gridConfig = reactive<GridOptions>({
     columns: [
 
-        { field: 'id', headerName: 'id', resizable: true, width: 10 },
-        { field: 'site_id', headerName: '网站ID', resizable: true, width: 50 },
-        { field: 'express_no', headerName: '物流公司', resizable: true, width: 100 },
-        { field: 'sender_province', headerName: '发件省', resizable: true, width: 100 },
-        { field: 'receive_province', headerName: '收件省', resizable: true, width: 100 },
-        { field: 'first_weight', headerName: '首重', resizable: true, width: 100 },
-        { field: 'continuous_weight', headerName: '续重', resizable: true, width: 100 },
-        { field: 'delivery', headerName: '平台', resizable: true, width: 100 }
+        {
+            field: 'id',
+            headerName: 'id',
+            resizable: true,
+            width: 10
+        },
+        {
+            field: 'site_id',
+            headerName: '网站ID',
+            resizable: true,
+            width: 50
+        },
+        {
+            field: 'express_no',
+            headerName: '物流公司',
+            resizable: true,
+            width: 100
+        },
+        {
+            field: 'sender_province',
+            headerName: '发件省',
+            resizable: true,
+            width: 100
+        },
+        {
+            field: 'receive_province',
+            headerName: '收件省',
+            resizable: true,
+            width: 100
+        },
+        {
+            field: 'first_weight',
+            headerName: '首重',
+            resizable: true,
+            width: 100
+        },
+        {
+            field: 'continuous_weight',
+            headerName: '续重',
+            resizable: true,
+            width: 100
+        },
+        {
+            field: 'delivery',
+            headerName: '平台',
+            resizable: true,
+            width: 100
+        }
 
     ],
     defaultColumnOption: {
@@ -315,84 +363,86 @@ defineExpose({
 
 <style lang="scss" scoped>
 .group-list {
-    .group-item {
-        height: 32px;
-        margin-top: 3px;
+  .group-item {
+    height: 32px;
+    margin-top: 3px;
 
-        .operate {
-            display: none;
-        }
-
-        &.active {
-            background-color: var(--el-color-primary-light-9);
-            color: var(--el-color-primary);
-        }
-
-        &:hover {
-            background-color: var(--el-color-primary-light-9);
-
-            .operate {
-                display: block;
-            }
-        }
+    .operate {
+      display: none;
     }
+
+    &.active {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+    }
+
+    &:hover {
+      background-color: var(--el-color-primary-light-9);
+
+      .operate {
+        display: block;
+      }
+    }
+  }
 }
 
 .attachment-item:hover {
-    .attachment-action {
-        display: block;
-    }
+  .attachment-action {
+    display: block;
+  }
 }
 
 .attachment-list-wrap {
-    .attachment-wrap {
-        background: var(--el-border-color-extra-light);
-    }
+  .attachment-wrap {
+    background: var(--el-border-color-extra-light);
+  }
 }
+
 .file-box-active {
-    &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        border: 15px solid;
-        border-bottom-color: var(--el-color-primary);
-        border-right-color: var(--el-color-primary);
-        border-top-color: transparent;
-        border-left-color: transparent;
-        bottom: 0;
-        right: 0;
-    }
-    span{
-        font-style: normal;
-    }
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    border: 15px solid;
+    border-bottom-color: var(--el-color-primary);
+    border-right-color: var(--el-color-primary);
+    border-top-color: transparent;
+    border-left-color: transparent;
+    bottom: 0;
+    right: 0;
+  }
+
+  span {
+    font-style: normal;
+  }
 }
 </style>
 <style lang="scss">
-    .video-preview {
-    background: none !important;
-    box-shadow: none !important;
+.video-preview {
+  background: none !important;
+  box-shadow: none !important;
 
-    .el-dialog__headerbtn .el-dialog__close {
-        border-radius: 50%;
-        width: 34px;
-        height: 34px;
-        font-size: 24px;
-        color: #fff;
-        background-color: var(--el-text-color-regular);
-        border-color: #fff;
-    }
+  .el-dialog__headerbtn .el-dialog__close {
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 24px;
+    color: #fff;
+    background-color: var(--el-text-color-regular);
+    border-color: #fff;
+  }
 }
 
 .el-upload-list {
-    position: absolute !important;
-    z-index: 10;
+  position: absolute !important;
+  z-index: 10;
 
-    .el-upload-list__item {
-        background: #fff !important;
-        box-shadow: var(--el-box-shadow-light);
-    }
+  .el-upload-list__item {
+    background: #fff !important;
+    box-shadow: var(--el-box-shadow-light);
+  }
 }</style>
-<style  >
+<style>
 .visual-grid-container {
   width: 100%;
   height: 350px;

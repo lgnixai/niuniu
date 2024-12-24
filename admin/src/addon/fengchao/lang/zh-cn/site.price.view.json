@@ -1,10 +1,10 @@
 {
-	"templateName":"运费模板名称",
-	"templateNamePlaceholder":"请输入运费模板名称",
-	"createTime":"创建时间",
-	"addTemplate":"添加运费模板",
-	"updateTemplate":"编辑运费模板",
-	"templateDeleteTips":"确定要删除该模板吗？",
+	"templateName": "运费模板名称",
+	"templateNamePlaceholder": "请输入运费模板名称",
+	"createTime": "创建时间",
+	"addTemplate": "添加运费模板",
+	"updateTemplate": "编辑运费模板",
+	"templateDeleteTips": "确定要删除该模板吗？",
 	"feeTypeName": "计费类型",
 	"isDefault": "默认模板",
 	"num": "按件",
@@ -31,33 +31,28 @@
 	"freeShippingWeight": "包邮重量（kg）",
 	"freeShippingVolume": "包邮体积（m³）",
 	"freeShippingPrice": "包邮金额",
-	"areaPlaceholder":"请选择地区",
+	"areaPlaceholder": "请选择地区",
 	"noDeliveryPlaceholder": "请选择不配送的地区",
 	"freeShippingPlaceholder": "请选择包邮的地区",
 	"notUnderZero": "不能小于等于0",
-
 	"deliveryCompany": "快递公司",
 	"firstFee": "首重",
-	"continueFee":"续重",
-
+	"continueFee": "续重",
 	"byFixed": "按固定金额",
 	"byWeight": "按首重续重",
 	"byPercent": "按百分比",
-
-	"fixedMoney":"固定金额",
+	"fixedMoney": "固定金额",
 	"fixedTip": "元,首重和续重均会加价",
-
-	"percentMoney":"按百分比",
+	"percentMoney": "按百分比",
 	"percentTip": "%,首重续重就均按照此百分比计算",
-
-
-	"weightMoney":"按首重续重",
+	"weightMoney": "按首重续重",
 	"weightFirstTip": "首重加价",
 	"weightContinueTip": "续重加价",
-
 	"setAll": "按此值重置所有渠道",
 	"expressNoPlaceholder": "快递品牌",
 	"selectPlaceholder": "请选择",
-	"deliveryPlaceholder": "服务商"
-
+	"deliveryPlaceholder": "服务商",
+	"kdniao": "快递鸟",
+	"yunjie": "云杰",
+	"validPercentageTips": "请输入0-100的数字"
 }

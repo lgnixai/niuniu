@@ -66,6 +66,7 @@ class Express extends BaseApiController
             case "1801":
 
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
+                //生成订单号
                 $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
                 $order_id = $order_id[0];
                 $res_data["order_id"] = $order_id;
