@@ -25,8 +25,8 @@ class Kdn extends BaseValidate
         'TransportType'          => 'require|in:1', // 假设 TransportType 有几个固定的枚举值
         'ShipperType'            => 'require|in:5', // 同上
         'OrderCode'              => 'require|max:50', // 订单编号，限制长度
-        'ExpType'                => 'require|in:1', // 快递类型，假设有固定枚举值
-        'PayType'                => 'require|in:3', // 支付方式
+        'ExpType'                => 'checkExpType', // 快递类型，假设有固定枚举值
+        'PayType'                => 'require|in:2,3', // 支付方式
         'Receiver'               => 'require|array',
         'Receiver.ProvinceName'  => 'require',
         'Receiver.CityName'      => 'require',
@@ -101,8 +101,8 @@ class Kdn extends BaseValidate
 
     protected $scene = [
         "1801" => [
-                "TransportType",
-                "ShipperType",
+
+
                 "OrderCode",
                 "ExpType",
                 "PayType",
@@ -137,7 +137,25 @@ class Kdn extends BaseValidate
             "Weight",
         ],
     ];
+    /**
+     * 自定义验证规则: ExpType
+     * @param mixed $value 字段值
+     * @param mixed $rule 验证规则
+     * @param array $data 数据
+     * @return bool|string
+     */
+    protected function checkExpType($value, $rule, $data)
+    {
+        if (empty($value)) {
+            return true; // 允许为空
+        }
 
+        if (is_string($value) || in_array($value, [1])) {
+            return true; // 允许为字符串或者值为 1, 2, 3
+        }
+
+        return 'ExpType 必须是空、字符串，或者 1, 2, 3 中的一个值';
+    }
 
 
 }

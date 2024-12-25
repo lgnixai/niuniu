@@ -10,9 +10,12 @@ use addon\fengchao\app\model\order\OrderDelivery;
 use addon\fengchao\app\model\OrderDeliveryReal;
 use addon\fengchao\app\model\pay\FengChaoPay;
 
+use addon\fengchao\app\service\admin\site\SiteAccountService;
+use addon\fengchao\app\service\core\common\PriceService;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\FengChaoPayService;
 use addon\fengchao\app\service\core\order\OrderService;
+use app\dict\pay\PayDict;
 use app\service\core\notice\NoticeService;
 use core\base\BaseApiService;
 use think\db\exception\DbException;
@@ -22,9 +25,9 @@ use think\facade\Log;
 use think\Response;
 
 /**
- * 快递鸟回掉对接
+ * 云杰回掉对接
  */
-class KdniaoNoticeService extends BaseApiService
+class YunjieNoticeService extends BaseApiService
 {
     public function __construct()
     {
@@ -38,7 +41,7 @@ class KdniaoNoticeService extends BaseApiService
 
     public function notice($data)
     {
-        Log::write('=====快递鸟回掉信息=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====去杰回调信息=====' . date('Y-m-d H:i:s', time()));
         Log::write($data);
         if ($data['RequestType'] != 103) return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
         $requestData = json_decode($data['RequestData'], true);//请求的DATA
@@ -49,24 +52,40 @@ class KdniaoNoticeService extends BaseApiService
 
             $this->sub($v, $requestData, $sign);
         }
-        Log::write('=====快递鸟业务执行完成=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰业务执行完成=====' . date('Y-m-d H:i:s', time()));
 
         return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
     }
 
+    /**
+     * @param $params
+     * @param $requestData
+     * @param $sign
+     * @return void
+     * @throws Exception
+     * 订单状态码
+     * 100=下单成功，
+     * 102=分配网点 ，103=分配快递员， 104=已取件，
+     *
+     * 301=计费，  208=更新重量， 501=已转寄
+     *
+     * 203=取消订单，  204=揽收失败， 205=作废 ，400=下单失败
+     *
+     * 2=在途中， 3=签收
+ */
     public function sub($params, $requestData, $sign)
     {
 
-        Log::write('=====快递鸟000=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰000=====' . date('Y-m-d H:i:s', time()));
 
         $order_id = $params['OrderCode'];
         $order_s = $this->orderModel->where(['order_id' => $order_id])->findOrEmpty();
-        Log::write('=====快递鸟000====='.json_encode($order_s) . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰000====='.json_encode($order_s) . date('Y-m-d H:i:s', time()));
 
         if ($order_s->isEmpty()) return;
         $order_info = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
 
-        Log::write('=====快递鸟111=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰111=====' . date('Y-m-d H:i:s', time()));
 
         if ($order_info->isEmpty()) return;
         $config = (new CommonService())->getSiteDriver('kdniao')['params'];
@@ -74,18 +93,17 @@ class KdniaoNoticeService extends BaseApiService
         //if ($this->encrypt($requestData, $config['api_key']) != $sign) return;
         //参数验证完成具体业务封装
         $state = $params['State'];
-        Log::write('=====快递鸟回调进入业务执行====='.$state . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰回调进入业务执行====='.$state . date('Y-m-d H:i:s', time()));
 
-        //订单调度失败/取消推送/虚假揽件 进行订单取消
-        if ($state == 99 || $state == 203 || $state == 206) $this->closeOrder($order_id, $params);
+        //订单取消/揽收失败/作废/下单失败
+        if ($state == 203 || $state == 204 || $state == 205|| $state == 400 ) $this->closeOrder($order_id, $params);
         //推送网点/快递员信息
         if ($state == 102 || $state == 103) $this->changePick($order_id, $params);
         //推送取件状态
         if ($state == 104) $this->pickPackage($order_id, $params);
-        //推送揽收状态改变重量
-        if ($state == 301 || $state == 601 || $state == 208) $this->changeWeight($order_id, $params);
-        //推送更换运单信息
-        if ($state == 302) $this->changeDelivery($order_id, $params);
+        //推送揽收状态改变重量 501 转寄
+        if ($state == 301 || $state == 501 || $state == 208) $this->changeWeight($order_id, $params);
+
         //推送签收状态
         if ($state == 3) $this->signPackage($order_id, $params);
     }
@@ -118,7 +136,7 @@ class KdniaoNoticeService extends BaseApiService
     public function changeDelivery($order_id, $params)
     {
         $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
-        Log::write('=====快递鸟changeDelivery====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰changeDelivery====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
 
         if ($deliveryInfo->isEmpty()) return;
         $deliveryInfo->save([
@@ -145,18 +163,35 @@ class KdniaoNoticeService extends BaseApiService
         try {
             $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
 
-            Log::write('=====快递鸟changeWeight====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
+            Log::write('=====云杰changeWeight====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
 
             if ($deliveryInfo->isEmpty()) {
                 return Response::create(['msg' => '接受成功', 'code' => 200, 'success' => true], 'json', 200);
             }
             $realInfo = $this->deliveryRealModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
-            $feeBlockList = [
-                [
-                    "fee" => $params['Cost'],
+            $site=(new SiteAccountService())->getInfo($params['site_id']);
+           //折扣类计费规则： OfficialFee*Costing['discount'] + InsureAmount+PackageFee+OtherFee+BackFee
+           //通票类计费规则： Costing['upperGround']*Costing['groundPrice']+ (Weight-Costing['upperGround'])Costing['rateOfStage'] + InsureAmount+PackageFee+OtherFee+BackFee
+            $discount=$site['yunjie_discount'];
+            $OfficialFee=$params['OfficialFee'] ?? 0;
+            //折扣类计费
+            $feeBlockList = [];
+            if (array_key_exists("discount", $params['Costing'])) {
+                array_push($feeBlockList,[
+                    "fee" => $params['OfficialFee'] * $discount,
                     "type" => '0',
-                    "name" => '重量计费'
-                ],
+                    "name" => '基础运费'
+                ]);
+
+            }else {
+                array_push($feeBlockList,[
+                    "fee" =>  $params['Costing']['upperGround']*$params['Costing']['groundPrice']+ ($params['chargedWeight']-$params['Costing']['upperGround'])*$params['Costing']['rateOfStage'],
+                    "type" => '0',
+                    "name" => '基础运费'
+                ]);
+            }
+            array_push($feeBlockList, [
+
                 [
                     "fee" => $params['PackageFee'] ?? 0,
                     "type" => '1',
@@ -169,16 +204,20 @@ class KdniaoNoticeService extends BaseApiService
                 ],
                 [
                     "fee" => $params['OtherFee'] ?? 0,
-                    "type" => '4',
+                    "type" => '3',
                     "name" => '其他费用'
                 ],
                 [
                     "fee" => $params['OverFee'] ?? 0,
-                    "type" => '5',
+                    "type" => '4',
                     "name" => '超长超重费'
                 ],
-            ];
-
+                [
+                    "fee" => $params['BackFee'] ?? 0,
+                    "type" => '5',
+                    "name" => '转寄费'
+                ],
+            ]);
             $total_fee=0;
             foreach ($feeBlockList as $key => $value) {
                 if (is_array($value)) {
@@ -188,8 +227,7 @@ class KdniaoNoticeService extends BaseApiService
                 }
             }
             $total_fee=round($total_fee,2);
-
-            Log::write('=====快递鸟changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
+            Log::write('=====云杰changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
             $feeWeight = $params['Weight'];
             $realInfo->where(['order_id' => $deliveryInfo['order_id']])->update([
                 'order_id' => $deliveryInfo['order_id'],
@@ -197,7 +235,7 @@ class KdniaoNoticeService extends BaseApiService
                 'volume' => $params['Volume'] ?? 0,
                 'fee_weight' => $feeWeight,
                 'fee_blockList' => json_encode($feeBlockList),
-                'total_fee' => $params['TotalFee'],
+                'total_fee' => $total_fee,
             ]);
             $orderInfo = $this->orderModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
             $orderInfo->save(['order_status' => OrderDict::FINISH_PICK]);
@@ -267,16 +305,16 @@ class KdniaoNoticeService extends BaseApiService
      */
     public function pickPackage($order_id, $params)
     {
-        //Log::write('快递鸟pickPackage'. json_encode($params). date('Y-m-d H:i:s', time()));
+        //Log::write('云杰pickPackage'. json_encode($params). date('Y-m-d H:i:s', time()));
 
         $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
         if ($deliveryInfo->isEmpty()) return;
-        Log::write('快递鸟pickPackage'. json_encode($params). date('Y-m-d H:i:s', time()));
+        Log::write('云杰pickPackage'. json_encode($params). date('Y-m-d H:i:s', time()));
 
         $orderInfo = $this->orderModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
         $orderInfo->save(['order_status' => OrderDict::FINISH_PICK]);
 
-        Log::write('快递鸟pickPackage'. json_encode($orderInfo). date('Y-m-d H:i:s', time()));
+        Log::write('云杰pickPackage'. json_encode($orderInfo). date('Y-m-d H:i:s', time()));
 
         //(new NoticeService())->send($orderInfo['site_id'], 'fengchao_order_pick', ['order_id' => $orderInfo['order_id']]);
     }
@@ -308,7 +346,7 @@ class KdniaoNoticeService extends BaseApiService
             ];
         }
 
-        Log::write('快递鸟changePick'. json_encode($u_data). date('Y-m-d H:i:s', time()));
+        Log::write('云杰changePick'. json_encode($u_data). date('Y-m-d H:i:s', time()));
 
         $deliveryInfo->save([
             'delivery_id' => $params['LogisticCode'] ?? '',

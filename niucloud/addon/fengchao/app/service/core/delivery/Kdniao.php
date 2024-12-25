@@ -54,6 +54,8 @@ class Kdniao extends BaseDelivery
 
         $data=$params;
         $data["OrderCode"]=$params["order_id"];
+        $data['TransportType']=1;
+        $data['ShipperType']=5;
         $resInfo = $this->execute('1801', $data);
 
         Log::write('快递鸟下单发送数据333：' . json_encode($resInfo));
@@ -66,6 +68,7 @@ class Kdniao extends BaseDelivery
         $res = [
             'service_order_code' => $resInfo['Order']['KDNOrderCode'],
             'client_order_code' => $params["OrderCode"],
+            'delivery_id' => "",
             'order_id' => $params["order_id"],
             'result'=>$resInfo
         ];

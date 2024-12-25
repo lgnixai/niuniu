@@ -61,7 +61,7 @@ class OrderService extends BaseApiService
             ->alias('o')
             ->join('fengchao_order_delivery od', 'o.order_id = od.order_id')
             ->where([ [ 'o.site_id', '=', $this->site_id ] ])
-            ->where('od.order_id|od.logistic_order_code|od.client_order_code', 'like', '%' . $where['order_code'] . '%')
+            ->where('od.order_id|od.delivery_id|od.client_order_code', 'like', '%' . $where['order_code'] . '%')
             ->withSearch(['create_time' ], $where)
              ->field('o.*,od.*');
 
@@ -89,7 +89,7 @@ class OrderService extends BaseApiService
             ->with(['deliveryInfo'])
             ->field($field)
             ->findOrEmpty()->toArray();
-        $pay_info = ( new OrderFee() )->where([["order_id","=",$order_id],["order_type","=","2"]])->findOrEmpty()->toArray();
+        $pay_info = ( new OrderFee() )->where([["order_id","=",$order_id]])->findOrEmpty()->toArray();
         $info['pay_info']=$pay_info;
 
         return $info;

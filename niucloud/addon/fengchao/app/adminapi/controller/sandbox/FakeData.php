@@ -77,29 +77,28 @@ class FakeData extends BaseApiController
 
         // 构造假数据
         $data = [
-            "TransportType"=>1,
-            "ShipperType" => 5, // 随机快递类型
-            "ShipperCode" => $faker->randomElement(["YD", "STO",  "ZTO","YTO","JTSD"]), // 快递公司编码
+
+            "ShipperCode" => $faker->randomElement(["YD", "STO",  "ZTO","YTO","JTSD","JD"]), // 快递公司编码
             "OrderCode" => $faker->uuid, // 商家订单编号
-            "ExpType" => 1, // 快递类型
-            "PayType" => 3, // 支付方式
+            "ExpType" => "P1", // 快递类型
+            "PayType" => 2, // 支付方式
 
             "Receiver" => [
                 "ProvinceName" => "广东省", // 固定为广东省
-                "CityName" => $faker->randomElement(["广州市", "深圳市", "东莞市", "佛山市"]),
-                "ExpAreaName" => $faker->randomElement(["天河区", "海珠区", "福田区", "南山区"]),
-                "Address" => $faker->streetName,
+                "CityName" => $faker->randomElement([ "深圳市"]),
+                "ExpAreaName" => $faker->randomElement(["南山区"]),
+                "Address" => "海德二路茂业时代广场",
                 "Name" => $faker->name,
-                "Mobile" => $mobile,
+                "Mobile" => 15603003393,
             ],
             "Sender" => [
 
                 "ProvinceName" => "河南省", // 固定为河南省
-                "CityName" => $faker->randomElement(["郑州市", "洛阳市", "开封市", "南阳市"]),
-                "ExpAreaName" => $faker->randomElement(["中原区", "二七区", "管城区", "惠济区"]),
-                "Address" => $faker->streetName,
+                "CityName" => $faker->randomElement(["洛阳市"]),
+                "ExpAreaName" => $faker->randomElement(["涧西区"]),
+                "Address" => '南昌路丽晶大酒店',
                 "Name" => $faker->name,
-                "Mobile" => $mobile,
+                "Mobile" => 15603003392,
             ],
             "Weight" => $faker->randomFloat(1, 0.5, 5.0), // 包裹重量 (0.5 ~ 5.0kg)
             "Quantity" => 1, // 数量
@@ -272,7 +271,7 @@ class FakeData extends BaseApiController
             "TransportType"=>1,
             "ShipperType" => 5, // 随机快递类型
             "Weight" => $faker->numberBetween(1, 5), // 随机快递类型
-
+            "InsureAmount"=>$faker->numberBetween(100, 2000), // 随机快递类型
             "Receiver" => [
                 "ProvinceName" => "广东省", // 固定为广东省
                 "CityName" => $faker->randomElement(["广州市", "深圳市", "东莞市", "佛山市"]),
@@ -349,7 +348,7 @@ class FakeData extends BaseApiController
         // 构造假数据
         $data = [
 
-            "KdnOrderCode" => $order_code,
+            "OrderCode" => $order_code,
 
         ];
 

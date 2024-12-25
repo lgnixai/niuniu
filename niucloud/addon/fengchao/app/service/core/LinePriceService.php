@@ -55,7 +55,7 @@ class LinePriceService extends BaseApiService
 
 
         $first_weight = 1;
-        $continuous_weight = abs($weight - 1 > 0 ? $weight - 1 : 0);
+        $continuous_weight = ceil(abs($weight - 1 > 0 ? $weight - 1 : 0));
 
         $order = 'create_time desc';
         $linePrice = $this->model
@@ -72,6 +72,7 @@ class LinePriceService extends BaseApiService
             $t["weight"] = $weight;
             $t["shipperCode"] = $v["express_no"];
             $t["firstWeight"] = $first_weight;
+            $t["firstWeightPrice"] = $v["first_weight"];
             $t["firstWeightAmount"] = $v["first_weight"];
             $t["continuousWeight"] = $continuous_weight;
             $t["continuousWeightPrice"] = $v["continuous_weight"];
@@ -80,10 +81,10 @@ class LinePriceService extends BaseApiService
             $t["isSubsectionContinuousWeightPrice"] = 0;
             $t["totalFee"] = $t["cost"];
             $t["price"]=[
-                "calcFeeType" => "profit",
+                "calcFeeType" => 1,//1:固定运费，2:折扣
                 "perAdd" => 0,
                 "cost" => $t["cost"],
-                "discount" => 1,
+                "discount" => 10,
                 "discountfee" => $t["cost"]
             ];
             array_push($prices, $t);

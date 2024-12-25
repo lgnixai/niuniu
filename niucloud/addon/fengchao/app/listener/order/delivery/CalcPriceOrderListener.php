@@ -2,6 +2,7 @@
 
 namespace addon\fengchao\app\listener\order\delivery;
 
+use addon\fengchao\app\model\order\OrderFee;
 use addon\fengchao\app\service\admin\site\SiteAccountService;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\delivery\DeliveryLoader;
@@ -51,37 +52,57 @@ class CalcPriceOrderListener
         });
         // 获取价格最便宜的数据
         $cheapest = reset($priceList); // 使用 reset 获取第一个元素
-        $totalFee=false;
-
-        $weight = $data["Weight"];
-
-        $first_weight = 1;
-        $continuous_weight = abs($weight - 1 > 0 ? $weight - 1 : 0);
 
 
-
+        $res=[];
         if ($cheapest) {
             // 计算折扣
 
             switch ($cheapest['driver']){
                 case 'kdniao':
-                    $totalFee = sprintf("%.2f", $cheapest["firstWeight"] + $continuous_weight * $cheapest["continuousWeight"]);
+
+                    $res['platform']='kdniao';
+
+                    $res['totalFee']=$cheapest["cost"];
 
                     break;
                 case 'yunjie':
-                    $totalFee =$cheapest["cost"]*$discount/10;
+                    $res['platform']='yunjie';
+                    $res['totalFee']=$cheapest["cost"]*$discount/10;
                     break;
                 default:
-                    $totalFee=false;
+
                     break;
             }
+            $cheapest['result']=$res;
 
-        } else {
-             $totalFee=false;
+
+            $ofdata=[];
+
+            $ofdata['order_id']=$data['order_id'];
+            $ofdata['fee_type']=$cheapest['price']['calcFeeType'];
+            $ofdata['platform']=$cheapest['driver'];
+            $ofdata['site_id']=$params['site_id'];
+            $ofdata['official_price']=$cheapest['price']['cost'];
+            $ofdata['discount']=$cheapest['price']['discount'];
+            $ofdata['total_fee']=$cheapest['totalFee'];
+            $ofdata['weight']=$cheapest['weight'];
+
+            $ofdata['first_weight']=$cheapest['firstWeight'];
+            $ofdata['first_weight_price']=$cheapest['firstWeightPrice'];
+            $ofdata['first_weight_amount']=$cheapest['firstWeightAmount'];
+            $ofdata['continuous_weight']=$cheapest['continuousWeight'];
+            $ofdata['continuous_weight_price']=$cheapest['continuousWeightPrice'];
+            $ofdata['continuous_weight_amount']=$cheapest['continuousWeightAmount'];
+
+
+            (new OrderFee())->create($ofdata);
+
+        }else{
+
         }
-        var_dump($cheapest);
-        echo $totalFee;
-        return $totalFee;
+
+        return $cheapest;
 
 
     }

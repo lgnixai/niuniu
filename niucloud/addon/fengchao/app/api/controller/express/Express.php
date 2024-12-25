@@ -9,6 +9,7 @@ use addon\fengchao\app\service\api\order\OrderCallBackLogService;
 use addon\fengchao\app\service\api\order\OrderEventService;
 use addon\fengchao\app\service\api\order\OrderPrice;
 use addon\fengchao\app\service\core\CoreOrderService;
+use addon\fengchao\app\service\core\notify\KdniaoNoticeService;
 use app\dict\pay\PayDict;
 use core\base\BaseApiController;
 use core\util\Snowflake;
@@ -21,7 +22,7 @@ class Express extends BaseApiController
 {
 
 
-    //快递鸟接口
+    //综合下单接口
     public function order()
     {
 
@@ -42,10 +43,7 @@ class Express extends BaseApiController
         ]);
 
         Log::write('接口请求参数(' . $data['RequestType'] . ')' . json_encode($data));
-
         $this->validate($data, 'addon\fengchao\app\validate\express\Order.auth');
-
-
         $requestData = urldecode($data['RequestData']);
         Log::write('接口请求' . json_encode($requestData));
 
@@ -68,39 +66,22 @@ class Express extends BaseApiController
                 $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
                 //生成订单号
                 $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
+
                 $order_id = $order_id[0];
-                $res_data["order_id"] = $order_id;
-                Log::write('1801下单接口' . json_encode($res_data));
-                $result = (new CoreOrderService())->CreateOrder($res_data);
-                $result=$result['result'];
-                Log::write('1801下单接口' . json_encode($result));
-
-
-
-
-//
-//                $res = (new CoreOrderService())->checkBalance($res_data);
-//                if ($res) {
-//                    $temp_order = $res_data;
-//                    $temp_order["OrderCode"] = $order_id;
-//                    $datas['RequestData'] = json_encode($temp_order, JSON_UNESCAPED_UNICODE);
-//                    $result = (new ExpressService())->Kdniao($datas);
-//                    if ($result["Success"]) {
-//                        $res_data["result"] = $result["Order"];
-//                        $res_data["order_id"] = $order_id;
-//                        $res = (new CoreOrderService())->createOrder($res_data);
-//                        event('AfterOrderCreate', ($result));
-//
-//
-//                        Log::write('快递鸟下单接口4444' . json_encode($result));
-//
-//                        $result['Order']['OrderCode'] = $res_data["OrderCode"];
-//                    }
-//
-//                    $result["Reason"] = "平台已接单";
-//                    $event_data["response"] = $result;
-//                    Log::write('快递鸟下单接口' . json_encode($result));
-//                }
+                if($order_id){
+                    $res_data["order_id"] = $order_id;
+                    Log::write('1801下单接口' . json_encode($res_data));
+                    $result = (new CoreOrderService())->CreateOrder($res_data);
+                    $result=$result['result'];
+                    Log::write('1801下单接口' . json_encode($result));
+                }else{
+                    $result = [];
+                    $result["EBusinessID"] = $data['EBusinessID'];
+                    $result["Data"] = [];
+                    $result["ResultCode"] = 10002;
+                    $result["Reason"] = "订单号重复";
+                    $result["Success"] = false;
+                }
                 break;
             case "1815":
                 //询价
@@ -149,14 +130,15 @@ class Express extends BaseApiController
                 break;
             default:
                 $result = (new ExpressService())->Kdniao($datas);
-                $event_data["response"] = $result;
                 Log::write('快递鸟其它接口(' . $data['RequestType'] . ')' . json_encode($result));
 
         }
+        $event_data["response"] = $result;
 
         //添加日志
         OrderEventService::createOrderLog($event_data);
         $result = (new CoreOrderService())->ChangeAppId($result);
+        $this->replaceKeyCaseInsensitive($result, 'KDNOrderCode', 'PlatCode');
 
         return json($result);
 
@@ -176,6 +158,7 @@ class Express extends BaseApiController
             ["RequestType", ''],
         ]);
 
+        ( new KdniaoNoticeService())->notice($data);
 
         // Log::write('订单回调' . json_encode($data,JSON_UNESCAPED_UNICODE));
 
@@ -192,6 +175,7 @@ class Express extends BaseApiController
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
+        exit;
 
 
         $data = json_decode($data['RequestData'], true);;
@@ -200,8 +184,8 @@ class Express extends BaseApiController
         $state = $res_data["State"];
 
         Log::write('订单回调完成$state' . $state);
-
-
+       echo  ( new KdniaoNoticeService())->notice($data);
+        exit;
         switch ($state) {
             case "301":
             case "208":
@@ -231,5 +215,25 @@ class Express extends BaseApiController
         // echo json_encode($res);
     }
 
+
+    public function replaceKeyCaseInsensitive(&$array, $oldKey, $newKey) {
+        $stack = [&$array]; // Initialize the stack with the top-level array
+
+        while (!empty($stack)) {
+            $current = &$stack[array_key_last($stack)]; // Get the reference to the current element
+            array_pop($stack); // Remove the current element from the stack
+
+            foreach ($current as $key => &$value) {
+                if (strcasecmp($key, $oldKey) === 0) { // Case-insensitive comparison
+                    $current[$newKey] = $value; // Add the new key-value pair
+                    unset($current[$key]);  // Remove the old key
+                }
+                if (is_array($value)) {
+                    $stack[] = &$value; // Push the child array to the stack
+                }
+            }
+            unset($value); // Break the reference to avoid side effects
+        }
+    }
 
 }

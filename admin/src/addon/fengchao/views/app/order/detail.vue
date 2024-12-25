@@ -1,14 +1,13 @@
 <template>
-  <el-dialog v-model="showDialog"  title="订单明细" width="900px" :destroy-on-close="true">
+  <el-dialog v-model="showDialog" title="订单明细" width="900px" :destroy-on-close="true">
     <el-scrollbar height="500px" v-loading="loading">
       <el-card class="order-card" shadow="hover">
-        <h2>订单详情</h2>
 
         <!-- 基本订单信息 -->
         <el-row :gutter="20" class="section">
           <el-col :span="12">
             <el-descriptions title="基本信息" column="1" border>
-              <el-descriptions-item label="订单 ID">{{ order.OrderId }}</el-descriptions-item>
+              <el-descriptions-item label="平台单号">{{ order.OrderId }}</el-descriptions-item>
               <el-descriptions-item label="客户订单号">{{ order.deliveryInfo.client_order_code }}</el-descriptions-item>
               <el-descriptions-item label="重量">{{ order.deliveryInfo.order_info.Weight }}</el-descriptions-item>
             </el-descriptions>
@@ -16,63 +15,105 @@
 
           <el-col :span="12">
             <el-descriptions title="物流信息" column="1" border>
-              <el-descriptions-item label="快递公司">{{ order.deliveryInfo.order_info.ShipperCode }}</el-descriptions-item>
+              <el-descriptions-item label="快递公司">{{
+                  order.deliveryInfo.order_info.ShipperCode
+                }}
+              </el-descriptions-item>
               <el-descriptions-item label="快递单号">{{ order.deliveryInfo.logistic_order_code }}</el-descriptions-item>
               <el-descriptions-item label="状态">{{ order.deliveryInfo.order_status_desc }}</el-descriptions-item>
 
             </el-descriptions>
           </el-col>
         </el-row>
-        <br /><br />
+        <br/><br/>
         <!-- 收发货信息 -->
         <el-row :gutter="20" class="section">
           <el-col :span="12">
             <el-descriptions title="收货信息" column="1" border>
-              <el-descriptions-item label="收货人">{{ order.deliveryInfo.order_info.Receiver.Name }}</el-descriptions-item>
-              <el-descriptions-item label="手机号">{{ order.deliveryInfo.order_info.Receiver.Mobile }}</el-descriptions-item>
-              <el-descriptions-item label="省">{{ order.deliveryInfo.order_info.Receiver.ProvinceName }}</el-descriptions-item>
-              <el-descriptions-item label="市">{{ order.deliveryInfo.order_info.Receiver.CityName }}</el-descriptions-item>
-              <el-descriptions-item label="区/县">{{ order.deliveryInfo.order_info.Receiver.ExpAreaName }}</el-descriptions-item>
-              <el-descriptions-item label="详细地址">{{ order.deliveryInfo.order_info.Receiver.Address }}</el-descriptions-item>
+              <el-descriptions-item label="收货人">{{
+                  order.deliveryInfo.order_info.Receiver.Name
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="手机号">{{
+                  order.deliveryInfo.order_info.Receiver.Mobile
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="省">{{
+                  order.deliveryInfo.order_info.Receiver.ProvinceName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="市">{{
+                  order.deliveryInfo.order_info.Receiver.CityName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="区/县">{{
+                  order.deliveryInfo.order_info.Receiver.ExpAreaName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="详细地址">{{
+                  order.deliveryInfo.order_info.Receiver.Address
+                }}
+              </el-descriptions-item>
             </el-descriptions>
           </el-col>
 
           <el-col :span="12">
             <el-descriptions title="发货信息" column="1" border>
-              <el-descriptions-item label="发货人">{{ order.deliveryInfo.order_info.Sender.Name }}</el-descriptions-item>
-              <el-descriptions-item label="手机号">{{ order.deliveryInfo.order_info.Sender.Mobile }}</el-descriptions-item>
-              <el-descriptions-item label="省">{{ order.deliveryInfo.order_info.Sender.ProvinceName }}</el-descriptions-item>
-              <el-descriptions-item label="市">{{ order.deliveryInfo.order_info.Sender.CityName }}</el-descriptions-item>
-              <el-descriptions-item label="区/县">{{ order.deliveryInfo.order_info.Sender.ExpAreaName }}</el-descriptions-item>
-              <el-descriptions-item label="详细地址">{{ order.deliveryInfo.order_info.Sender.Address }}</el-descriptions-item>
+              <el-descriptions-item label="发货人">{{
+                  order.deliveryInfo.order_info.Sender.Name
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="手机号">{{
+                  order.deliveryInfo.order_info.Sender.Mobile
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="省">{{
+                  order.deliveryInfo.order_info.Sender.ProvinceName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="市">{{
+                  order.deliveryInfo.order_info.Sender.CityName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="区/县">{{
+                  order.deliveryInfo.order_info.Sender.ExpAreaName
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item label="详细地址">{{
+                  order.deliveryInfo.order_info.Sender.Address
+                }}
+              </el-descriptions-item>
             </el-descriptions>
           </el-col>
         </el-row>
-        <br /><br />
+        <br/><br/>
         <el-row :gutter="20" class="section">
           <el-col :span="24">
             <el-descriptions title="商品信息" column="3" border>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity" :key="`goods-${index}`" label="商品名称">
+              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+                                    :key="`goods-${index}`" label="商品名称">
                 {{ item.GoodsName }}
               </el-descriptions-item>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity" :key="`quantity-${index}`" label="商品件数">
+              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+                                    :key="`quantity-${index}`" label="商品件数">
                 {{ item.GoodsQuantity }}
               </el-descriptions-item>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity" :key="`price-${index}`" label="商品价格">
+              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+                                    :key="`price-${index}`" label="商品价格">
                 {{ item.GoodsPrice }}
               </el-descriptions-item>
             </el-descriptions>
           </el-col>
         </el-row>
-        <br /><br />
+        <br/><br/>
         <!-- 支付信息 -->
         <el-row :gutter="20" class="section">
           <el-col :span="24">
             <el-descriptions title="费用信息" column="2" border>
-<!--              <el-descriptions-item label="基础运费">{{ order.pay_info.cost }}</el-descriptions-item>-->
-<!--              <el-descriptions-item label="首重金额">{{ order.pay_info.first_weight_amount }}</el-descriptions-item>-->
-<!--              <el-descriptions-item label="续重总金额">{{ order.pay_info.continuous_weight_amount }}</el-descriptions-item>-->
-<!--              <el-descriptions-item label="额外费用">{{ order.pay_info.other_fee }}</el-descriptions-item>-->
+              <!--              <el-descriptions-item label="基础运费">{{ order.pay_info.cost }}</el-descriptions-item>-->
+              <!--              <el-descriptions-item label="首重金额">{{ order.pay_info.first_weight_amount }}</el-descriptions-item>-->
+              <!--              <el-descriptions-item label="续重总金额">{{ order.pay_info.continuous_weight_amount }}</el-descriptions-item>-->
+              <!--              <el-descriptions-item label="额外费用">{{ order.pay_info.other_fee }}</el-descriptions-item>-->
               <el-descriptions-item label="计费重量">{{ order.pay_info.weight }}</el-descriptions-item>
               <el-descriptions-item label="总费用">{{ order.pay_info.total_fee }}</el-descriptions-item>
             </el-descriptions>

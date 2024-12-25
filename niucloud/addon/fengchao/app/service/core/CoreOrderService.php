@@ -13,6 +13,7 @@ use addon\fengchao\app\service\admin\site\BalanceService;
 use addon\fengchao\app\service\api\common\Utils;
 use addon\fengchao\app\service\api\express\ExpressService;
 use addon\fengchao\app\service\core\order\OrderService;
+use addon\fengchao\app\model\OrderDeliveryReal;
 use app\dict\pay\PayDict;
 use app\model\pay\Pay;
 use app\model\pay\Refund;
@@ -48,6 +49,7 @@ class CoreOrderService extends BaseApiService
 
     public function ChangeAppId($params){
         $params["EBusinessID"]=$this->member_id;
+        unset($params[""]);
         return $params;
     }
     public function checkBalance($params)
@@ -81,17 +83,17 @@ class CoreOrderService extends BaseApiService
         Db::startTrans();
         try {
 
-            $order_id= (new OrderDeliveryService())->getOrderIdByClient($data["OrderCode"]);
+            $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
 
             $res=event('DeliveryCancelOrder', ['site_id' => $this->site_id, 'data' => [
 
-                'order_id' => $order_id,
-                'platform' => 'kdniao',
+                'order_id' => $order['order_id'],
+                'platform' => $order['platform'],
             ]]);
 
 
             event('CancelOrder', [
-                'id' => $order_id,
+                'id' => $order['order_id'],
                 'close_reason' => "用户主动退款",
             ]);
 
@@ -114,10 +116,12 @@ class CoreOrderService extends BaseApiService
             $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
 
             $res=event('DeliveryViewOrder', ['site_id' => $this->site_id, 'data' => [
-                'order_id'=>$order['order_id'],
+
                 'service_order_code'=>$order['service_order_code'],
                 'client_order_code'=>$order['client_order_code'],
-                'platform' => 'kdniao',
+
+                'order_id' => $order['order_id'],
+                'platform' => $order['platform'],
             ]]);
             Db::commit();
             return $res[0];
@@ -136,10 +140,11 @@ class CoreOrderService extends BaseApiService
 
             $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
             $arr=array_merge($data,[
-                'order_id'=>$order['order_id'],
+
                 'service_order_code'=>$order['service_order_code'],
                 'client_order_code'=>$order['client_order_code'],
-                'platform' => 'kdniao',
+                'order_id' => $order['order_id'],
+                'platform' => $order['platform'],
             ]);
 
             $res=event('DeliveryComplaintOrder', ['site_id' => $this->site_id, 'data' =>$arr]);
@@ -159,10 +164,11 @@ class CoreOrderService extends BaseApiService
 
             $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
             $arr=array_merge($data,[
-                'order_id'=>$order['order_id'],
+
                 'service_order_code'=>$order['service_order_code'],
                 'client_order_code'=>$order['client_order_code'],
-                'platform' => 'kdniao',
+                'order_id' => $order['order_id'],
+                'platform' => $order['platform'],
             ]);
 
             $res=event('DeliveryComplaintViewOrder', ['site_id' => $this->site_id, 'data' =>$arr]);
@@ -184,10 +190,11 @@ class CoreOrderService extends BaseApiService
             $order= (new OrderDeliveryService())->getOrderInfoByClient($data["OrderCode"]);
 
             $res=event('DeliveryRouteOrder', ['site_id' => $this->site_id, 'data' => [
-                'order_id'=>$order['order_id'],
+
                 'service_order_code'=>$order['service_order_code'],
                 'client_order_code'=>$order['client_order_code'],
-                'platform' => 'kdniao',
+                'order_id' => $order['order_id'],
+                'platform' => $order['platform'],
             ]]);
 
             Db::commit();
@@ -202,6 +209,10 @@ class CoreOrderService extends BaseApiService
     //下单
     public function CreateOrder($data)
     {
+        //不足 1 公斤按 1 公斤
+        if($data['Weight']<1){
+            $data['Weight']=1;
+        }
 
         Log::write("下单---".json_encode($data,true).'---'.date("Y-m-d H:i:s").'------');
 
@@ -211,64 +222,67 @@ class CoreOrderService extends BaseApiService
             $priceInfo = event('CalcPriceOrder', ['site_id' => $this->site_id, 'data' => $data]);
             $priceInfo= $priceInfo [0];
 
-            Log::write("下单44---".json_encode($priceInfo,true).'---'.date("Y-m-d H:i:s").'------');
+            Log::write("获取此订单下单渠道及价格".json_encode($priceInfo,true).'---'.date("Y-m-d H:i:s").'------');
+            if(!$priceInfo){
+                throw new CommonException("暂不支持此渠道的业务");
+            }
 
-            exit;
+            $data['platform'] =$priceInfo["result"]['platform'];
 
-            $data['platform'] ='kdniao';
+
 
             $submitInfo = event('DeliverySendOrder', ['site_id' => $this->site_id, 'data' => $data]);
+            //var_dump($submitInfo);
             $submitInfo = $submitInfo [0];
+            if (isset($submitInfo['type']) && $submitInfo['type'] == 'error') {
+                Db::commit();
 
-            Log::write("下单33---".json_encode($submitInfo,true).'---'.date("Y-m-d H:i:s").'------');
+                $result = [];
+                $result["EBusinessID"] = 0;
+                $result["Data"] = [];
+                $result["ResultCode"] = 10004;
+                $result["Reason"] = $submitInfo['msg'];
+                $result["Success"] = false;
+                return ['result'=>$result];
+            }
 
-
-
-
-          // exit;
-//
-//
-//            exit;
-            $linePrice=(new LinePriceService())->getOrderLinePrice($data);
-
-//            $order = [
-//                "site_id" => $this->site_id,
-//                'ip' => request()->ip() ?? '',
-//                "order_id" => $data["result"]["OrderCode"],
-//            ];
-//            $this->model->save($order);
+            Log::write("向第三方下单".json_encode($submitInfo,true).'---'.date("Y-m-d H:i:s").'------');
 
             $order_delivery = [
                 "site_id" => $this->site_id,
                 "app_id" => $this->member_id,
+                "platform"=>$data['platform'],
                 "order_id" => $submitInfo['order_id'],
-                "line_price_id" => 1,
+                "delivery_id" => $submitInfo['delivery_id'],
                 "client_order_code" => $submitInfo["client_order_code"],
                 "service_order_code" => $submitInfo["service_order_code"],
+                "delivery_type" => $data["ShipperCode"],
                 "order_info"=>$data
             ];
 
             $this->deliveryModel->save($order_delivery);
-
+            (new OrderDeliveryReal())->create([
+                'order_id' => $submitInfo['order_id'],
+                "weight" => $data['Weight'],
+            ]);
 
             $pay_data = [
                 "order_id" => $data["order_id"],
                 "site_id" => $this->site_id,
                 "trade_type" => 1,
-                "money" => $priceInfo['totalFee'],
+                "money" => $priceInfo['result']['totalFee'],
                 "status" => PayDict::STATUS_WAIT,
             ];
             $this->payModel->save($pay_data);
             $pay_data['pay_id']=$this->payModel->id;
             $pay_data['memo']="下单预扣费";
-
             event('PayCreate', $pay_data);
             Db::commit();
             return $submitInfo;
         } catch (Exception $e) {
             Db::rollback();
             Log::write('下单失败' . date('Y-m-d H:i:s'));
-            Log::write($e->getMessage());
+            Log::write(json_encode($e));
             throw new CommonException($e->getMessage());
         }
 
@@ -387,12 +401,14 @@ class CoreOrderService extends BaseApiService
             $pay_data = [
                 "order_id" => $order_id,
                 "trade_type" => 2,
+                "site_id" => $this->site_id,
                 "money" => $pay_info["money"],
                 "status" => PayDict::STATUS_WAIT,
             ];
             $this->payModel->save($pay_data);
             $pay_data['pay_id']=$this->payModel->id;
             $pay_data['memo']=$reason;
+
 
             event('PayCreate', $pay_data);
 

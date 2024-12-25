@@ -13,7 +13,6 @@ namespace addon\fengchao\app\adminapi\controller\sandbox;
 
 use addon\fengchao\app\service\admin\api\SiteApiService;
 use addon\fengchao\app\service\admin\site\OrderLogService;
-use addon\fengchao\app\service\api\express\ExpressService;
 use addon\fengchao\app\service\api\marketing\pointexchange\OrderCreateService;
 use core\base\BaseApiController;
 use Faker\Provider\zh_CN\Company;
@@ -47,7 +46,7 @@ class CallBack extends BaseApiController
             '208' =>'修正重量（用户举报客服对账)',
             '3' => '已签收',
             '301' => '揽件状态（包含费用明细）',
-//            '302' => '更换运单号信息',
+            '302' => '更换运单号信息',
              '401' => '工单回推',
 //            '402' => '修改订单通知',
 //            '501' => '推送工单赔付结果',
@@ -450,6 +449,50 @@ class CallBack extends BaseApiController
     }
 
     public function Fake_301($site_id)
+    {
+        $data = [
+            "PushTime" => "2023-10-10 18:13:23",
+            "EBusinessID" => "350238",
+            "Data" => [
+                [
+                    "CreateTime" => "2023-10-10 20:51:04",
+                    "EBusinessID" => "350238",
+                    "ShipperCode" => "SF",
+                    "LogisticCode" => "SF1390004911440",
+                    "KDNOrderCode" => "KDNIST2310101000000001",
+                    "OrderCode" => "TEST23100001",
+                    "PickerInfo" => [
+                        [
+                            "PickupCode" => "1234"
+                        ]
+                    ],
+                    "CallRequestType" => "1801",
+                    "State" => "301",
+                    "FetchTime" => "",
+                    "Reason" => "订单已完成",
+                    "Weight" => 2.0,
+                    "FirstWeightAmount" => "6.50",
+                    "ContinuousWeightAmount" => "2.00",
+                    "Cost" => 8.5,
+                    "InsureAmount" => "2.00",
+                    "PackageFee" => "3.00",
+                    "OverFee" => "0.00",
+                    "OtherFee" => "1.00",
+                    "OtherFeeDetail" => "{\"其他费用\":\"1.00\"}",
+                    "TotalFee" => 14.5,
+                    "Volume" => 19200.0,
+                    "VolumeWeight" => 1.5,
+                    "Success" => true,
+                    "OperateType" => 2
+                ]
+            ],
+            "Count" => 1
+        ];
+        // 返回 JSON 数据
+        return success($data);
+
+    }
+    public function Fake_302($site_id)
     {
         $data = [
             "PushTime" => "2023-10-10 18:13:23",

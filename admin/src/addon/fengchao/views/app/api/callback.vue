@@ -9,9 +9,9 @@
           <el-col :span="12">
             <el-form-item label="请求报文内容" prop="template_name" label-position="top">
               <el-input v-model.trim="formData.request_data"
-                  type="textarea"
-                  :rows="14"
-                  placeholder=""
+                        type="textarea"
+                        :rows="14"
+                        placeholder=""
               >
               </el-input>
             </el-form-item>
@@ -19,9 +19,9 @@
           <el-col :span="12">
             <el-form-item label="返回报文" prop="template_name" label-position="top">
               <el-input v-model.trim="response_data"
-                  type="textarea"
-                  :rows="14"
-                  placeholder=""
+                        type="textarea"
+                        :rows="14"
+                        placeholder=""
               >
               </el-input>
             </el-form-item>
@@ -31,7 +31,7 @@
           <el-form-item label="OrderCode" prop="template_name">
             <el-input v-model.trim="formData.OrderCode" class="input-width"/>
           </el-form-item>
-        <el-form-item label="EBusinessID" prop="template_name">
+          <el-form-item label="EBusinessID" prop="template_name">
             <el-input v-model.trim="formData.api_key" class="input-width"/>
           </el-form-item>
 
@@ -55,17 +55,18 @@
           <el-form-item :label="t('status')" prop="status">
             <el-select v-model="api_id" clearable placeholder="选择测试接口"
                        class="input-width">
-<!--              <el-option label="选择测试接口" value="0" />-->
+              <!--              <el-option label="选择测试接口" value="0" />-->
 
-              <el-option :label="'(' + item[0] + ')'+item[1] "  :value="item[0]" v-for="(item, index) in apiList" :key="index"/>
+              <el-option :label="'(' + item[0] + ')'+item[1] " :value="item[0]" v-for="(item, index) in apiList"
+                         :key="index"/>
             </el-select>
-            {{api_id}}
+            {{ api_id }}
           </el-form-item>
 
         </el-row>
 
         <el-row :gutter="20">
-          <el-form-item >
+          <el-form-item>
             <el-button type="primary" @click="save(formRef)">发送</el-button>
 
           </el-form-item>
@@ -228,7 +229,7 @@ const save = async (formEl: FormInstance | undefined) => {
             const ApiKey = data.api_secret
             data.EBusinessID = data.api_key
             data.RequestData = JSON.stringify(RequestData)
-            data.RequestType = data.api_id
+            data.RequestType = 103
 
             // console.log("json")
             // console.log(RequestData)

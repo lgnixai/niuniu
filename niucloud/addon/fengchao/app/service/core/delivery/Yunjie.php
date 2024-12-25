@@ -77,6 +77,7 @@ class Yunjie extends BaseDelivery
         $item["shipperCode"] = "JD";
 
         $item["firstWeight"] = $resInfo['upperGround'];
+        $item["firstWeightPrice"] = $resInfo['groundPrice'];
         $item["firstWeightAmount"] = $resInfo['groundPrice'];
         $item["continuousWeight"] = 0;
         $item["continuousWeightPrice"] = $resInfo['rateOfStage'];
@@ -85,7 +86,7 @@ class Yunjie extends BaseDelivery
         $item["isSubsectionContinuousWeightPrice"] = 0;
         $item["totalFee"] = $resInfo['discountfee'];
         $item["price"] = [
-            "calcFeeType" => 'discount',
+            "calcFeeType" => '2',
             "perAdd" => 0,
             "cost" => $resInfo['totalfee'],
             "discount" => $resInfo['discount'],
@@ -107,54 +108,33 @@ class Yunjie extends BaseDelivery
      */
     public function sendOrder($params)
     {
+        $data=$params;
+        $data['PayType']=2;
+        $data["OrderCode"]=$params["order_id"];
+       // $data['ExpType']=$data['ShipperCode'];
+        unset($data['order_id'],$data['platform']);
 
-        $data = [
-            'ShipperCode' => $params['deliveryType'],//注意指定权限
-            'TransportType' => 1,
-            'ShipperType' => 5,
-            'OrderCode' => $params['thirdNo'],
-            'ExpType' => 1,
-            'PayType' => 3,
-            'Sender' => [
-                'Name' => $params['senderName'],
-                'Mobile' => $params['senderMobile'],
-                'ProvinceName' => $params['senderProvince'],
-                'CityName' => $params['senderCity'],
-                'ExpAreaName' => $params['senderDistrict'],
-                'Address' => $params['senderAddress'],
-            ],
-            'Receiver' => [
-                'Name' => $params['receiveName'],
-                'Mobile' => $params['receiveMobile'],
-                'ProvinceName' => $params['receiveProvince'],
-                'CityName' => $params['receiveCity'],
-                'ExpAreaName' => $params['receiveDistrict'],
-                'Address' => $params['receiveAddress'],
-            ],
-            'Weight' => $params['weight'],
-            'Quantity' => $params['packageCount'],
-            'Volume' => (int)$params['vloumLong'] * $params['vloumWidth'] * $params['vloumHeight'],
-            'Remark' => $params['remark'],
-            'Commodity' => [
-                [
-                    'GoodsName' => $params['goods'],
-                    'GoodsQuantity' => $params['packageCount'],
-                    'GoodsPrice' => $params['guaranteeValueAmount'],
-                ]
-            ],
-            'InsureAmount' => $params['guaranteeValueAmount'],
-        ];
-        $resInfo = $this->execute('1801', $data);
+        Log::write('云杰下单发送数据：' . json_encode($data));
 
-        Log::write('快递鸟下单发送数据333：' . json_encode($resInfo));
+         $resInfo = $this->execute('1801', $data);
+//        $resInfo =[
+//            'ResultCode' => 110,
+//            'Reason' => '下单失败抱歉，当前收件地址暂未开通服务，努力建设中',
+//
+//        ];
+
+        Log::write('云杰下单反回发送数据：' . json_encode($resInfo));
         if ($resInfo['ResultCode'] != 100) {
-            Log::write('提交运单失败：kdniao_error--' . $resInfo['Reason']);
-            return ['type' => 'error', 'msg' => $resInfo['Reason'] ?? 'kdniao三方平台下单失败，请重新下单！'];
+            Log::write('提交运单失败：yunjie_error--' . $resInfo['Reason']);
+            return ['type' => 'error', 'msg' => $resInfo['Reason'] ?? '三方平台下单失败，请重新下单！'];
         }
 
         $res = [
-            'orderNo' => $resInfo['Order']['KDNOrderCode'],
-            'deliveryId' => '',
+            'service_order_code' => $resInfo['Order']['PlatCode'],
+            'client_order_code' => $params["OrderCode"],
+            'delivery_id' => $resInfo['Order']['LogisticCode'],
+            'order_id' => $params["order_id"],
+            'result'=>$resInfo
         ];
         return $res;
     }
@@ -190,7 +170,7 @@ class Yunjie extends BaseDelivery
         $params = [
             "OrderCode" => $data['order_id'],
         ];
-        $resInfo = $this->execute('1802', $params);
+        $resInfo = $this->execute('1804', $params);
         $resInfo['data'] = $resInfo['ResultCode'];
         $resInfo['msg'] = $resInfo['Reason'];
         if ($resInfo['ResultCode'] == 100) {
@@ -326,5 +306,7 @@ class Yunjie extends BaseDelivery
     {
         return urlencode(base64_encode(md5($data . $ApiKey)));
     }
+
+
 
 }
