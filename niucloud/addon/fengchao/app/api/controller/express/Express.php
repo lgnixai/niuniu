@@ -173,7 +173,7 @@ class Express extends BaseApiController
             ["RequestType", ''],
         ]);
 
-        (new KdniaoNoticeService())->notice($data);
+        (new YunjieNoticeService())->notice($data);
 
         // Log::write('订单回调' . json_encode($data,JSON_UNESCAPED_UNICODE));
         $data = json_decode($data['RequestData'], true);;

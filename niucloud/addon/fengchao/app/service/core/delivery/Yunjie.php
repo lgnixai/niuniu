@@ -4,6 +4,7 @@ namespace addon\fengchao\app\service\core\delivery;
 
 use addon\fengchao\app\dict\delivery\KdniaoBrandDict;
 use addon\fengchao\app\model\order\Order;
+use addon\fengchao\app\service\admin\site\SiteAccountService;
 use addon\fengchao\app\service\core\ExpressService;
 use Exception;
 use think\facade\Log;
@@ -66,7 +67,13 @@ class Yunjie extends BaseDelivery
 
         Log::write('云杰询价发送数据：' . json_encode($data));
 
+
         $resInfo = $this->execute('1002', $data);
+
+
+        $site=(new SiteAccountService())->getInfo($params['site_id']);
+        $discount=$site['yunjie_discount'];
+
         Log::write('云杰询价返回信息：' . json_encode($resInfo));
         if (!isset($resInfo['ResultCode']) || $resInfo['ResultCode'] != 100) return [];
         $callbackData = [];
@@ -83,15 +90,15 @@ class Yunjie extends BaseDelivery
         $item["continuousWeight"] = 0;
         $item["continuousWeightPrice"] = $resInfo['rateOfStage'];
         $item["continuousWeightAmount"] = $resInfo['rateOfStage'];
-        $item["cost"] = $resInfo['totalfee'];
+        $item["cost"] = $resInfo['totalfee']; //原价
         //$item["isSubsectionContinuousWeightPrice"] = 0;
-        $item["totalFee"] = $resInfo['discountfee'];
+        $item["totalFee"] =  $resInfo['totalfee']*$discount/10;
         $item["price"] = [
             "calcFeeType" => '2',
             "perAdd" => 0,
             "cost" => $resInfo['totalfee'],
-            "discount" => $resInfo['discount'],
-            "discountfee" => $resInfo['discountfee'],
+            "discount" => $discount,
+            "discountfee" =>  $item["totalFee"]
         ];
         $item["insureAmount"] = $resInfo['InsureAmount'] ?? 0;
         $item["premiumFee"] = $resInfo['InsureValue'] ?? 0;

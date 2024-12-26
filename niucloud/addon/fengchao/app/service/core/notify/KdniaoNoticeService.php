@@ -7,9 +7,11 @@ use addon\fengchao\app\model\order\FengChaoOrder;
 
 
 use addon\fengchao\app\model\order\OrderDelivery;
+use addon\fengchao\app\model\order\OrderFee;
 use addon\fengchao\app\model\OrderDeliveryReal;
 use addon\fengchao\app\model\pay\FengChaoPay;
 
+use addon\fengchao\app\service\core\common\PriceService;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\FengChaoPayService;
 use addon\fengchao\app\service\core\order\OrderService;
@@ -34,26 +36,23 @@ class KdniaoNoticeService extends BaseApiService
         $this->orderModel = new FengChaoOrder();
         $this->deliveryModel = new OrderDelivery();
         $this->payModel = new FengChaoPay();
-
         $this->deliveryRealModel = new OrderDeliveryReal();
     }
 
     public function notice($data)
     {
-        Log::write('=====快递鸟回调信息=====' . date('Y-m-d H:i:s', time()));
-        Log::write($data);
+        Log::write('=====快递鸟回调信息=====' . json_encode($data) . date('Y-m-d H:i:s', time()));
+
         if ($data['RequestType'] != 103) return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
         $requestData = json_decode($data['RequestData'], true);//请求的DATA
         $params = $requestData['Data'];
         $sign = $data['DataSign'];
-
         foreach ($params as $k => $v) {
-
             $this->sub($v, $requestData, $sign);
         }
         Log::write('=====快递鸟业务执行完成=====' . date('Y-m-d H:i:s', time()));
 
-        return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
+        return true;
     }
 
     public function sub($params, $requestData, $sign)
@@ -62,20 +61,19 @@ class KdniaoNoticeService extends BaseApiService
 
         $order_id = $params['OrderCode'];
         $order_s = $this->orderModel->where(['order_id' => $order_id])->findOrEmpty();
-        Log::write('=====快递鸟订单信息====='.json_encode($order_s) . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟订单信息=====' . json_encode($order_s) . date('Y-m-d H:i:s', time()));
 
         if ($order_s->isEmpty()) return;
         $order_info = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
 
-        Log::write('=====快递鸟物流单====='.json_encode($order_info)  . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟物流单=====' . json_encode($order_info) . date('Y-m-d H:i:s', time()));
 
         if ($order_info->isEmpty()) return;
         $config = (new CommonService())->getSiteDriver('kdniao')['params'];
         if (!isset($config['api_key']) || $config['api_key'] == '') return;
-        //if ($this->encrypt($requestData, $config['api_key']) != $sign) return;
-        //参数验证完成具体业务封装
         $state = $params['State'];
-        Log::write('=====快递鸟回调进入业务执行====='.json_encode($params) . date('Y-m-d H:i:s', time()));
+
+        Log::write('=====快递鸟回调进入业务执行=====' . json_encode($params) . date('Y-m-d H:i:s', time()));
 
         //订单调度失败/取消推送/虚假揽件 进行订单取消
         if ($state == 99 || $state == 203 || $state == 206) $this->closeOrder($order_id, $params);
@@ -119,7 +117,7 @@ class KdniaoNoticeService extends BaseApiService
     public function changeDelivery($order_id, $params)
     {
         $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
-        Log::write('=====快递鸟changeDelivery====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟changeDelivery=====' . json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
 
         if ($deliveryInfo->isEmpty()) return;
         $deliveryInfo->save([
@@ -146,53 +144,59 @@ class KdniaoNoticeService extends BaseApiService
         try {
             $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
 
-            Log::write('=====快递鸟changeWeight====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
+            Log::write('=====快递鸟changeWeight=====' . json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
 
             if ($deliveryInfo->isEmpty()) {
-                return Response::create(['msg' => '接受成功', 'code' => 200, 'success' => true], 'json', 200);
+                throw new CommonException('物流信息不存在');
             }
             $realInfo = $this->deliveryRealModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
+
+            $orderFee = (new PriceService())->ModifyWeight(['order_id' => $order_id, 'weight' => $params['Weight']]);
+
             $feeBlockList = [
                 [
-                    "fee" => $params['Cost'],
-                    "type" => '0',
+                    "fee" => $orderFee['cost'],
+                    "type" => 'cost',
                     "name" => '重量计费'
                 ],
                 [
                     "fee" => $params['PackageFee'] ?? 0,
-                    "type" => '1',
+                    "type" => 'package_fee',
                     "name" => '包装费用'
                 ],
                 [
                     "fee" => $params['InsureAmount'] ?? 0,
-                    "type" => '2',
+                    "type" => 'insure_amount',
                     "name" => '保价费用'
                 ],
                 [
                     "fee" => $params['OtherFee'] ?? 0,
-                    "type" => '4',
+                    "type" => 'other_fee',
                     "name" => '其他费用'
                 ],
                 [
                     "fee" => $params['OverFee'] ?? 0,
-                    "type" => '5',
+                    "type" => 'over_fee',
                     "name" => '超长超重费'
+                ],
+                [
+                    "fee" => $params['BackFee'] ?? 0,
+                    "type" => 'back_fee',
+                    "name" => '转寄费'
                 ],
             ];
 
-            $total_fee=0;
+            $total_fee = 0;
             foreach ($feeBlockList as $key => $value) {
                 if (is_array($value)) {
-
-                        $total_fee += $value['fee'];
-
+                    $total_fee += $value['fee'];
                 }
             }
-            $total_fee=round($total_fee,2);
+            $total_fee = round($total_fee, 2);
 
-            Log::write('=====快递鸟changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
+            Log::write('=====快递鸟changeWeight=====' . json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
 
-            Log::write('=====快递鸟changeWeight====='.json_encode($params) . date('Y-m-d H:i:s', time()));
+            Log::write('=====快递鸟changeWeight=====' . json_encode($params) . date('Y-m-d H:i:s', time()));
 
             $feeWeight = $params['Weight'];
             $realInfo->where(['order_id' => $deliveryInfo['order_id']])->update([
@@ -207,48 +211,48 @@ class KdniaoNoticeService extends BaseApiService
             $orderInfo->save(['order_status' => OrderDict::FINISH_PICK]);
 
 
-            //获取支付信息
-            $pay_info= (new FengChaoPayService())->getInfoByOrderId($order_id);
-            if (empty($pay_info))
-                throw new CommonException('支付订单获取失败');
+            $money = sprintf("%.2f", $total_fee - $orderFee['total_fee']);
+
+            if($money>0){
+                $pay_data = [
+                    "order_id" => $order_id,
+                    "site_id" => $this->site_id,
+                    "trade_type" => 3,
+                    "money" => $money,
+                    "status" => PayDict::STATUS_WAIT,
+                ];
+                $this->payModel->save($pay_data);
+
+                $pay_data['pay_id'] = $this->payModel->id;
+                $pay_data['memo'] = "订单补差价";
+
+                event('PayCreate', $pay_data);
+
+                foreach ($feeBlockList as $key => $value) {
+                    $orderFee[$value['type']]=$value['fee'];
+                }
+                $orderFee['total_fee']=$total_fee;
+                $orderFee['volume']=$params["Volume"];
+                $orderFee['volume_weight']=$params["VolumeWeight"];
+
+                (new OrderFee())->update($orderFee, ['order_id' => $orderFee['order_id']]);
+
+            }
 
 
 
 
-            $money=sprintf("%.2f",$total_fee-$pay_info["money"]);
-
-
-
-            $pay_data = [
-                "order_id" => $order_id,
-                "site_id" => $this->site_id,
-                "trade_type" =>  3,
-                "money" => $money,
-                "status" => PayDict::STATUS_WAIT,
-            ];
-            $this->payModel->save($pay_data);
-
-            $pay_data['pay_id']=$this->payModel->id;
-            $pay_data['memo']="订单补差价";
-
-            event('PayCreate', $pay_data);
-
-            $change_data=[
-                'add_price_status'=>1,
-                'order_id'=>$order_id
-            ];
-            (new OrderService())->update($change_data);
             //修改订单明细
-            $odi= (new OrderDelivery())
-                ->where([['order_id', '=', $order_id]])->find( );
+            $odi = (new OrderDelivery())
+                ->where([['order_id', '=', $order_id]])->find();
             if (empty($odi))
                 throw new CommonException('订单获取失败');
 
-            $odi->weight=$params["Weight"];
-            $odi->total_fee=$total_fee;
-            $odi->volume=$params["Volume"];
-            $odi->volume_weight=$params["VolumeWeight"];
-            $odi->update_time=time();
+            $odi->weight = $params["Weight"];
+            $odi->total_fee = $total_fee;
+            $odi->volume = $params["Volume"];
+            $odi->volume_weight = $params["VolumeWeight"];
+            $odi->update_time = time();
             $odi->save($odi);
 
             Db::commit();
@@ -275,12 +279,12 @@ class KdniaoNoticeService extends BaseApiService
 
         $deliveryInfo = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
         if ($deliveryInfo->isEmpty()) return;
-        Log::write('快递鸟pickPackage'. json_encode($params). date('Y-m-d H:i:s', time()));
+        Log::write('快递鸟pickPackage' . json_encode($params) . date('Y-m-d H:i:s', time()));
 
         $orderInfo = $this->orderModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
         $orderInfo->save(['order_status' => OrderDict::FINISH_PICK]);
 
-        Log::write('快递鸟pickPackage'. json_encode($orderInfo). date('Y-m-d H:i:s', time()));
+        Log::write('快递鸟pickPackage' . json_encode($orderInfo) . date('Y-m-d H:i:s', time()));
 
         //(new NoticeService())->send($orderInfo['site_id'], 'fengchao_order_pick', ['order_id' => $orderInfo['order_id']]);
     }
@@ -312,7 +316,7 @@ class KdniaoNoticeService extends BaseApiService
             ];
         }
 
-        Log::write('快递鸟changePick'. json_encode($u_data). date('Y-m-d H:i:s', time()));
+        Log::write('快递鸟changePick' . json_encode($u_data) . date('Y-m-d H:i:s', time()));
 
         $deliveryInfo->save([
             'delivery_id' => $params['LogisticCode'] ?? '',

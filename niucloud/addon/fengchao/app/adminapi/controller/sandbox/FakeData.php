@@ -78,7 +78,7 @@ class FakeData extends BaseApiController
         // 构造假数据
         $data = [
 
-            "ShipperCode" => $faker->randomElement(["YD", "STO",  "ZTO","YTO","JTSD","JD"]), // 快递公司编码
+            "ShipperCode" => $faker->randomElement(["YD", "STO",  "ZTO","YTO","JTSD","Jing"]), // 快递公司编码
             "OrderCode" => $faker->uuid, // 商家订单编号
             "ExpType" => "P1", // 快递类型
             "PayType" => 2, // 支付方式

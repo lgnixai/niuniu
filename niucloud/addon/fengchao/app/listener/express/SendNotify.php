@@ -48,7 +48,7 @@ class SendNotify
 
         $notify=[];
 
-        $api=(new CommonService())->GetApiKeyByOrderId($data["FCOrderCode"]);
+        $api=(new CommonService())->GetApiKeyByOrderId($data["order_id"]);
 
         $body=[];
         $body["RequestData"]=[

@@ -7,10 +7,12 @@ use addon\fengchao\app\model\order\FengChaoOrder;
 
 
 use addon\fengchao\app\model\order\OrderDelivery;
+use addon\fengchao\app\model\order\OrderFee;
 use addon\fengchao\app\model\OrderDeliveryReal;
 use addon\fengchao\app\model\pay\FengChaoPay;
 
 use addon\fengchao\app\service\admin\site\SiteAccountService;
+use addon\fengchao\app\service\core\common\PriceService;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\FengChaoPayService;
 use addon\fengchao\app\service\core\order\OrderService;
@@ -173,53 +175,60 @@ class YunjieNoticeService extends BaseApiService
             }
 
             $realInfo = $this->deliveryRealModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
-            $site=(new SiteAccountService())->getInfo($this->site_id);
+            ///$site=(new SiteAccountService())->getInfo($this->site_id);
             //折扣类计费规则： OfficialFee*Costing['discount'] + InsureAmount+PackageFee+OtherFee+BackFee
             //通票类计费规则： Costing['upperGround']*Costing['groundPrice']+ (Weight-Costing['upperGround'])Costing['rateOfStage'] + InsureAmount+PackageFee+OtherFee+BackFee
 
-            $discount=$site['yunjie_discount'];
+
             $OfficialFee=$params['OfficialFee'] ?? 0;
+
+            $orderFee = (new PriceService())->ModifyWeight(['order_id' => $order_id, 'weight' => $params['Weight']]);
+            $discount=$orderFee['discount'];
             //折扣类计费
             $feeBlockList = [];
             if (array_key_exists("discount", $params['Costing'])) {
                 array_push($feeBlockList,[
                     "fee" => $params['OfficialFee'] * $discount/10,
-                    "type" => '0',
+                    "type" => 'cost',
                     "name" => '基础运费'
                 ]);
 
             }else {
                 array_push($feeBlockList,[
                     "fee" =>  $params['Costing']['upperGround']*$params['Costing']['groundPrice']+ ($params['chargedWeight']-$params['Costing']['upperGround'])*$params['Costing']['rateOfStage'],
-                    "type" => '0',
+                    "type" => 'cost',
                     "name" => '基础运费'
                 ]);
             }
             $feeBlockList=array_merge($feeBlockList, [
-
+                [
+                    "fee" => $orderFee['cost'],
+                    "type" => 'cost',
+                    "name" => '重量计费'
+                ],
                 [
                     "fee" => $params['PackageFee'] ?? 0,
-                    "type" => '1',
+                    "type" => 'package_fee',
                     "name" => '包装费用'
                 ],
                 [
                     "fee" => $params['InsureAmount'] ?? 0,
-                    "type" => '2',
+                    "type" => 'insure_amount',
                     "name" => '保价费用'
                 ],
                 [
                     "fee" => $params['OtherFee'] ?? 0,
-                    "type" => '3',
+                    "type" => 'other_fee',
                     "name" => '其他费用'
                 ],
                 [
                     "fee" => $params['OverFee'] ?? 0,
-                    "type" => '4',
+                    "type" => 'over_fee',
                     "name" => '超长超重费'
                 ],
                 [
                     "fee" => $params['BackFee'] ?? 0,
-                    "type" => '5',
+                    "type" => 'back_fee',
                     "name" => '转寄费'
                 ],
             ]);
@@ -231,15 +240,9 @@ class YunjieNoticeService extends BaseApiService
                        $total_fee += $value['fee'];
                 }
             }
-
-
-
             $total_fee=round($total_fee,2);
-            if($deliveryInfo['total_fee']>=$total_fee){
-                Log::write('已支付金额大于费用'.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
 
-                return ;
-            }
+
             Log::write('=====云杰changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
 
             $feeWeight = $params['Weight'];
@@ -254,38 +257,35 @@ class YunjieNoticeService extends BaseApiService
             $orderInfo = $this->orderModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
             $orderInfo->save(['order_status' => OrderDict::FINISH_PICK]);
 
+            $money = sprintf("%.2f", $total_fee - $orderFee['total_fee']);
 
-            //获取支付信息
-            $pay_info= (new FengChaoPayService())->getInfoByOrderId($order_id);
-            if (empty($pay_info))
-                throw new CommonException('支付订单获取失败');
-
-            //需要补差价的处理；
-            if($total_fee-$pay_info["money"]>0){
-                $money=sprintf("%.2f",$total_fee-$pay_info["money"]);
-
+            if($money>0){
                 $pay_data = [
                     "order_id" => $order_id,
                     "site_id" => $this->site_id,
-                    "trade_type" =>  3,
+                    "trade_type" => 3,
                     "money" => $money,
                     "status" => PayDict::STATUS_WAIT,
                 ];
                 $this->payModel->save($pay_data);
 
-                $pay_data['pay_id']=$this->payModel->id;
-                $pay_data['memo']="订单补差价";
+                $pay_data['pay_id'] = $this->payModel->id;
+                $pay_data['memo'] = "订单补差价";
 
                 event('PayCreate', $pay_data);
+
+                foreach ($feeBlockList as $key => $value) {
+                    $orderFee[$value['type']]=$value['fee'];
+                }
+                $orderFee['total_fee']=$total_fee;
+                $orderFee['volume']=$params["Volume"];
+                $orderFee['volume_weight']=$params["chargedWeight"];
+                $orderFee['official_fee']=$params["OfficialFee"];
+                (new OrderFee())->update($orderFee, ['order_id' => $orderFee['order_id']]);
+
             }
 
 
-
-            $change_data=[
-                'add_price_status'=>1,
-                'order_id'=>$order_id
-            ];
-            (new OrderService())->update($change_data);
 
             //修改订单明细
             $odi= (new OrderDelivery())

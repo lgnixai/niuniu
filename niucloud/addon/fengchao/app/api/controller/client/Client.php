@@ -39,13 +39,13 @@ class Client extends BaseApiController
         $res["Reason"] = "成功";
         $res["UpdateTime"] = date('Y-m-d H:i:s');
 
-        echo json_encode($res);
-        flush(); // 确保响应输出到客户端
-
-        // 继续后台操作
-        if (function_exists('fastcgi_finish_request')) {
-            fastcgi_finish_request();
-        }
+//        echo json_encode($res);
+//        flush(); // 确保响应输出到客户端
+//
+//        // 继续后台操作
+//        if (function_exists('fastcgi_finish_request')) {
+//            fastcgi_finish_request();
+//        }
 
 
         Log::write('下游收到的信息222' . json_encode($data["RequestData"], JSON_UNESCAPED_UNICODE));
@@ -54,9 +54,9 @@ class Client extends BaseApiController
 
 
 
-        $requestData=($data["RequestData"]);
+        $requestData1=($data["RequestData"]);
 
-         $requestData=json_decode($res["RequestData"],true);
+         $requestData=json_decode($data["RequestData"],true);
         //$AppKey="330aa1fd76054c6c87a5672e6b9db88bbbc4454ba092edf4710518544df97c32";
 
        // $verifySignData=(new SiteAuthService())->encrypt($requestData,$AppKey);
@@ -70,7 +70,7 @@ class Client extends BaseApiController
         $api_secret = Crypto::decrypt($auth['api_secret'], Key::loadFromAsciiSafeString($encryption_key));
 
 
-        $verifySignData=(new SiteAuthService())->encryptNoUrl(json_encode($requestData),$api_secret);
+        $verifySignData=(new SiteAuthService())->encryptNoUrl(json_encode($requestData1),$api_secret);
 
         Log::write($verifySignData  );
         Log::write($data["DataSign"] );

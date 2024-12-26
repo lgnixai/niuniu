@@ -30,7 +30,6 @@ class FengChaoPayService extends BaseApiService
     //获取支付订单信息
     public function  getInfoByOrderId($order_id)
     {
-
         $info=$this->model->where([['order_id', '=', $order_id],['trade_type', '=',1],['status', '=',2]])->findOrEmpty()->toArray();
         return $info;
     }

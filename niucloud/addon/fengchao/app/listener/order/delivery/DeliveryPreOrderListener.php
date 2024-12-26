@@ -20,11 +20,12 @@ class DeliveryPreOrderListener
      */
     public function handle($data)
     {
+        $data=$data["data"];
         $drivers = (new CommonService())->getSiteDriver($data['site_id']);
         $pre_data = [];
         //$low_data = [];
         foreach ($drivers as $k => $v) {
-            $pre = (new DeliveryLoader($v['type'], $v['params']))->preOrder($data['data']);
+            $pre = (new DeliveryLoader($v['type'], $v['params']))->preOrder($data);
             $pre_list = [];
             foreach ($pre as $k1 => $v1) {
 //                $newPrice = $this->newPriceAndRule($v1, $data['data']['weight'], $data['site_id']);

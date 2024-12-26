@@ -22,6 +22,28 @@ class PriceService extends BaseApiService
         $this->model=new OrderFee();
     }
 
+    //208修改重量 重新计算价格
+    public function ModifyWeight($params)
+    {
+        $feeInfo=$this->model->where(['order_id'=>$params['order_id']])->findOrEmpty()->toArray();
+
+        if($feeInfo['fee_type']==1){
+            $weight=$params['weight'];
+            $first_weight = $feeInfo['first_weight'];
+            $continuous_weight = ceil(abs($weight - $first_weight > 0 ? $weight - $first_weight : 0));
+            $feeInfo['weight']=$params['weight'];
+            $feeInfo["continuous_weight"] = $continuous_weight;
+            $feeInfo["continuous_weight_amount"] = $continuous_weight * $feeInfo["continuous_weight_price"];
+            $feeInfo["cost"] = sprintf("%.2f", $feeInfo["first_weight_amount"] + $feeInfo["continuous_weight_amount"]);
+
+
+        }elseif($feeInfo['fee_type']==2){
+
+
+        }
+        return $feeInfo ;
+    }
+
     public function PriceAndRule($params)
     {
 

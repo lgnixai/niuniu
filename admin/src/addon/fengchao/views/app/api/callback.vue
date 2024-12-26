@@ -204,6 +204,12 @@ watch(api_id, () => {
                 // console.log("data.fee_data",data.fee_data)
                 formData.api_id = api_id
                 formData.request_data = JSON.stringify(data, null, 2)
+
+                const RequestData = JSON.parse(formData.request_data)
+                RequestData.Data[0].OrderCode = formData.OrderCode
+
+                console.log(RequestData)
+                formData.request_data = JSON.stringify(RequestData, null, 2)
             }
             // loading.value = false
         }).catch(() => {

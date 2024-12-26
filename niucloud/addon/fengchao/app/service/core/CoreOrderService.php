@@ -76,8 +76,8 @@ class CoreOrderService extends BaseApiService
     //预下单
     public function PreOrder($params)
     {
-
-        $resInfo = event('DeliveryPreOrder', ['site_id' => $this->site_id, 'data' => $params]);
+        $params['site_id']=$this->site_id;
+        $resInfo = event('DeliveryPreOrder', [ 'data' => $params]);
         $dataInfo = $resInfo[0];
 
         return $dataInfo;
@@ -312,83 +312,7 @@ class CoreOrderService extends BaseApiService
     }
 
     //回调
-    public function ConfirmOrder($data)
-    {
 
-        Log::write("回调---" . json_encode($data, true) . '---' . date("Y-m-d H:i:s") . '------');
-        $order_id = $data["OrderCode"];
-        $client_id = (new OrderDeliveryService())->getClientIdById($data["OrderCode"]);
-        $server_order_id = $data["KDNOrderCode"];
-
-        $state = $data["State"];
-        try {
-            Db::startTrans();
-
-            $order_info = (new OrderService())->getInfo($order_id);
-            if (empty($order_info))
-                throw new CommonException('订单获取失败');
-
-            if ($order_info['add_price_status'] == 1) {
-                throw new CommonException('此订单已补完差价');
-            }
-
-            //获取支付息
-            $pay_info = (new FengChaoPayService())->getInfoByOrderId($order_id);
-            if (empty($pay_info))
-                throw new CommonException('支付订单获取失败');
-
-            $params = $data;
-            $params["order_id"] = $order_id;
-
-            $total_fee = (new PriceService())->PriceAndRule($params);
-
-
-            $money = sprintf("%.2f", $total_fee - $pay_info["money"]);
-
-
-            $pay_data = [
-                "order_id" => $order_id,
-                "site_id" => $this->site_id,
-                "trade_type" => 3,
-                "money" => $money,
-                "status" => PayDict::STATUS_WAIT,
-            ];
-            $this->payModel->save($pay_data);
-
-            $pay_data['pay_id'] = $this->payModel->id;
-            $pay_data['memo'] = "订单补差价";
-
-            event('PayCreate', $pay_data);
-
-            $change_data = [
-                'add_price_status' => 1,
-                'order_id' => $order_id
-            ];
-            (new OrderService())->update($change_data);
-            //修改订单明细
-            $odi = (new OrderDelivery())
-                ->where([['order_id', '=', $order_id]])->find();
-            if (empty($odi))
-                throw new CommonException('订单获取失败');
-            $odi->weight = $data["Weight"];
-            $odi->total_fee = $total_fee;
-            $odi->volume = $data["Volume"];
-            $odi->volume_weight = $data["VolumeWeight"];
-            $odi->update_time = time();
-            $odi->save($odi);
-
-
-            Db::commit();
-            return true;
-        } catch (Exception $e) {
-            Db::rollback();
-            Log::write('订单确认费用失败' . date('Y-m-d H:i:s'));
-            Log::write($e->getMessage());
-            throw new CommonException($e->getMessage());
-        }
-
-        return true;
-    }
 
     //退款
     public function RefundOrder($data)
@@ -476,15 +400,15 @@ class CoreOrderService extends BaseApiService
 //            $odi->update_time = time();
 //            $odi->save($odi);
             $order = [
-                "order_id" => $data["OrderCode"],
+                "order_id" => $order_id,
                 "reason" => $data["Reason"],
                 "state" => $state,
                 "server_data" => $data,
             ];
             (new OrderCallBackLogService())->add($order);
 
-            $data["OrderCode"] = $client_id;
-            $data["FCOrderCode"] = $order_id;
+            $data["order_id"] = $order_id;
+
             event('SendNotify', $data);
 
             Db::commit();
