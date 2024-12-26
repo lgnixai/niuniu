@@ -49,7 +49,7 @@ class CoreOrderService extends BaseApiService
 
     public function ChangeAppId($params){
         $params["EBusinessID"]=$this->member_id;
-        unset($params[""]);
+        //unset($params[""]);
         return $params;
     }
     public function checkBalance($params)
@@ -387,7 +387,7 @@ class CoreOrderService extends BaseApiService
                 throw new CommonException('订单获取失败');
 
             if($order_info['refund_status']==1){
-                throw new CommonException('此订单已退款');
+                throw new CommonException('此订单已退款',);
             }
 
 

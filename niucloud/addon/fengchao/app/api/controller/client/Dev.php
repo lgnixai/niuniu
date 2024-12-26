@@ -37,7 +37,7 @@ class Dev extends BaseApiController
         }
 
 
-       // return success($msg = 'SUCCESS', json_encode($result));
+         return success($msg = 'SUCCESS', json_encode($result));
 
     }
 

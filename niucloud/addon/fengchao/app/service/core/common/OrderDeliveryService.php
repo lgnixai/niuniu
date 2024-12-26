@@ -27,7 +27,7 @@ class OrderDeliveryService extends BaseApiService
         $info = $this->model->where([["site_id","=",$this->site_id],['client_order_code', '=', $order_id]])->findOrEmpty()->toArray();
 
         if (empty($info))
-            throw new CommonException('获取客户订单号失败'.$this->site_id.'--'.$order_id);
+            throw new CommonException('获取客户订单号失败'.$order_id);
 
         return $info["order_id"];
     }
@@ -37,7 +37,7 @@ class OrderDeliveryService extends BaseApiService
         $info = $this->model->where([["site_id","=",$this->site_id],['client_order_code', '=', $order_id]])->field('order_id,platform,client_order_code,service_order_code')->findOrEmpty()->toArray();
 
         if (empty($info))
-            throw new CommonException('获取客户订单号失败'.$this->site_id.'--'.$order_id);
+            throw new CommonException('获取客户订单号失败'.$order_id);
 
         return $info;
     }

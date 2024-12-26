@@ -18,6 +18,7 @@ use app\service\admin\auth\AuthService;
 use app\service\admin\auth\LoginService;
 use Closure;
 use core\exception\AuthException;
+use core\exception\CommonException;
 
 /**
  * admin用户登录token验证
@@ -40,7 +41,15 @@ class ApiCheckSign
 
         $auth=(new SiteAuthService())->getByAppKey($data["EBusinessID"]);
         if(empty($auth)){
-            throw new AuthException('EBusinessID不存在');
+
+            return json(
+                [
+                    "EBusinessID"=>$data["EBusinessID"],
+                    "ResultCode" => 10001,
+                    "Reason" => "EBusinessID不存在",
+                    "Success" =>false
+                ]
+            );
         }
         $requestData=urldecode($data["RequestData"]);
 
@@ -49,8 +58,14 @@ class ApiCheckSign
 
 
         if($data["DataSign"]!==$verifySignData){
-             throw new AuthException('数据签名错误');
-
+            return json(
+                [
+                    "EBusinessID"=>$data["EBusinessID"],
+                    "ResultCode" => 10001,
+                    "Reason" => "数据签名错误",
+                    "Success" =>false
+                ]
+            );
         }
 
 

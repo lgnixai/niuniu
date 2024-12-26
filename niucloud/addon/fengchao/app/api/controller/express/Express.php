@@ -12,6 +12,7 @@ use addon\fengchao\app\service\core\CoreOrderService;
 use addon\fengchao\app\service\core\notify\KdniaoNoticeService;
 use app\dict\pay\PayDict;
 use core\base\BaseApiController;
+use core\exception\CommonException;
 use core\util\Snowflake;
 use think\facade\Cache;
 use think\facade\Log;
@@ -43,102 +44,114 @@ class Express extends BaseApiController
         ]);
 
         Log::write('接口请求参数(' . $data['RequestType'] . ')' . json_encode($data));
-        $this->validate($data, 'addon\fengchao\app\validate\express\Order.auth');
-        $requestData = urldecode($data['RequestData']);
-        Log::write('接口请求' . json_encode($requestData));
+        try {
+            $this->validate($data, 'addon\fengchao\app\validate\express\Order.auth');
+            $requestData = urldecode($data['RequestData']);
+            Log::write('接口请求' . json_encode($requestData));
 
-        $datas = array(
+            $datas = array(
 
-            'RequestType' => $data['RequestType'],
-            'RequestData' => ($requestData),
-            'SiteId' => $this->request->siteId(),
-        );
-        $event_data = [];
-        $event_data["request"] = $requestData;
-        $event_data["request_type"] = $data['RequestType'];
-        $event_data["site_id"] = $this->request->siteId();
+                'RequestType' => $data['RequestType'],
+                'RequestData' => ($requestData),
+                'SiteId' => $this->request->siteId(),
+            );
+            $event_data = [];
+            $event_data["request"] = $requestData;
+            $event_data["request_type"] = $data['RequestType'];
+            $event_data["site_id"] = $this->request->siteId();
 
-        $res_data = json_decode($requestData, true);
-        $result = [];
-        switch ($data['RequestType']) {
-            case "1801":
+            $res_data = json_decode($requestData, true);
+            $result = [];
 
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
-                //生成订单号
-                $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
+            switch ($data['RequestType']) {
+                case "1801":
 
-                $order_id = $order_id[0];
-                if($order_id){
-                    $res_data["order_id"] = $order_id;
-                    Log::write('1801下单接口' . json_encode($res_data));
-                    $result = (new CoreOrderService())->CreateOrder($res_data);
-                    $result=$result['result'];
-                    Log::write('1801下单接口' . json_encode($result));
-                }else{
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1801');
+                    //生成订单号
+                    $order_id = event('CreateOrder', ['site_id' => $this->request->siteId(), 'order_code' => $res_data["OrderCode"]]);
+
+                    $order_id = $order_id[0];
+                    if ($order_id) {
+                        $res_data["order_id"] = $order_id;
+                        Log::write('1801下单接口' . json_encode($res_data));
+                        $result = (new CoreOrderService())->CreateOrder($res_data);
+                        $result = $result['result'];
+                        Log::write('1801下单接口' . json_encode($result));
+                    } else {
+                        $result = [];
+                        $result["EBusinessID"] = $data['EBusinessID'];
+                        $result["Data"] = [];
+                        $result["ResultCode"] = 10002;
+                        $result["Reason"] = "订单号重复";
+                        $result["Success"] = false;
+                    }
+                    break;
+                case "1815":
+                    //询价
+                    Log::write('请求 1815 报价' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1815');
+                    $res = (new CoreOrderService())->PreOrder($res_data);
+
+                    $event_data["response"] = $res;
+
                     $result = [];
                     $result["EBusinessID"] = $data['EBusinessID'];
-                    $result["Data"] = [];
-                    $result["ResultCode"] = 10002;
-                    $result["Reason"] = "订单号重复";
-                    $result["Success"] = false;
-                }
-                break;
-            case "1815":
-                //询价
-                Log::write('请求 1815 报价' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1815');
-                $res = (new CoreOrderService())->PreOrder($res_data);
+                    $result["Data"] = $res;
+                    $result["ResultCode"] = 100;
+                    $result["Reason"] = "查询成功！";
+                    $result["Success"] = true;
+                    break;
+                case "1802":
+                    //取消订单
+                    Log::write('请求 1802 报价' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
+                    $result = (new CoreOrderService())->CancelOrder($res_data);
+                    break;
+                case "1804":
+                    //查询订单
+                    Log::write('请求 1804 查询订单' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
+                    $result = (new CoreOrderService())->ViewOrder($res_data);
+                    break;
+                case "1807":
+                    //查询订单
+                    Log::write('请求 1807 工单订单' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
+                    $result = (new CoreOrderService())->ComplaintOrder($res_data);
+                    break;
+                case "1818":
+                    //查询订单
+                    Log::write('请求 1807 工单订单' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
+                    $result = (new CoreOrderService())->ComplaintViewOrder($res_data);
+                    break;
+                case "1816":
+                    //轨迹查询订单
+                    Log::write('请求 1816 轨迹查询订单' . json_encode($requestData));
+                    $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
+                    $result = (new CoreOrderService())->RouteOrder($res_data);
+                    break;
+                default:
+                    $result = (new ExpressService())->Kdniao($datas);
+                    Log::write('快递鸟其它接口(' . $data['RequestType'] . ')' . json_encode($result));
 
-                $event_data["response"] = $res;
+            }
+            $event_data["response"] = $result;
 
-                $result = [];
-                $result["EBusinessID"] = $data['EBusinessID'];
-                $result["Data"] = $res;
-                $result["ResultCode"] = 100;
-                $result["Reason"] = "查询成功！";
-                $result["Success"] = true;
-                break;
-            case "1802":
-                //取消订单
-                Log::write('请求 1802 报价' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
-                $result = (new CoreOrderService())->CancelOrder($res_data);
-                break;
-            case "1804":
-                //查询订单
-                Log::write('请求 1804 查询订单' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
-                $result = (new CoreOrderService())->ViewOrder($res_data);
-                break;
-            case "1807":
-                //查询订单
-                Log::write('请求 1807 工单订单' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
-                $result = (new CoreOrderService())->ComplaintOrder($res_data);
-                break;
-            case "1818":
-                //查询订单
-                Log::write('请求 1807 工单订单' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1807');
-                $result = (new CoreOrderService())->ComplaintViewOrder($res_data);
-                break;
-            case "1816":
-                //轨迹查询订单
-                Log::write('请求 1816 轨迹查询订单' . json_encode($requestData));
-                $this->validate($res_data, 'addon\fengchao\app\validate\express\Kdn.1802');
-                $result = (new CoreOrderService())->RouteOrder($res_data);
-                break;
-            default:
-                $result = (new ExpressService())->Kdniao($datas);
-                Log::write('快递鸟其它接口(' . $data['RequestType'] . ')' . json_encode($result));
+            //添加日志
+            OrderEventService::createOrderLog($event_data);
+            $result = (new CoreOrderService())->ChangeAppId($result);
+            $this->replaceKeyCaseInsensitive($result, 'KDNOrderCode', 'PlatCode');
 
+        } catch (\Throwable $e) {
+            $result = [];
+            $result["EBusinessID"] = $data['EBusinessID'];
+            $result["Data"] = [];
+            $result["ResultCode"] = 10001;
+            $result["Reason"] = $e->getMessage();
+            $result["Success"] = false;
+            return json($result);
         }
-        $event_data["response"] = $result;
-
-        //添加日志
-        OrderEventService::createOrderLog($event_data);
-        $result = (new CoreOrderService())->ChangeAppId($result);
-        $this->replaceKeyCaseInsensitive($result, 'KDNOrderCode', 'PlatCode');
 
         return json($result);
 
@@ -158,7 +171,7 @@ class Express extends BaseApiController
             ["RequestType", ''],
         ]);
 
-        ( new KdniaoNoticeService())->notice($data);
+        (new KdniaoNoticeService())->notice($data);
 
         // Log::write('订单回调' . json_encode($data,JSON_UNESCAPED_UNICODE));
 
@@ -184,7 +197,7 @@ class Express extends BaseApiController
         $state = $res_data["State"];
 
         Log::write('订单回调完成$state' . $state);
-       echo  ( new KdniaoNoticeService())->notice($data);
+        echo (new KdniaoNoticeService())->notice($data);
         exit;
         switch ($state) {
             case "301":
@@ -216,7 +229,8 @@ class Express extends BaseApiController
     }
 
 
-    public function replaceKeyCaseInsensitive(&$array, $oldKey, $newKey) {
+    public function replaceKeyCaseInsensitive(&$array, $oldKey, $newKey)
+    {
         $stack = [&$array]; // Initialize the stack with the top-level array
 
         while (!empty($stack)) {
