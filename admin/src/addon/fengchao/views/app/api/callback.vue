@@ -160,7 +160,7 @@ if (route.query.id) {
             }
             // console.log("data.fee_data",data.fee_data)
             formData.value = data.fee_data
-            api_id.value = 103
+            api_id.value = 100
         }
         loading.value = false
     }).catch(() => {
@@ -175,6 +175,7 @@ const getApiNameData = async () => {
     // const data = Object.entries(res)
 
     const sortedList = [
+        ['100', '云杰测试'],
         ['103', '已分配快递员'],
         ['104', '推送已取件'],
         ['2', '推送在途中状态'],

@@ -19,6 +19,7 @@ use app\service\admin\auth\LoginService;
 use Closure;
 use core\exception\AuthException;
 use core\exception\CommonException;
+use think\facade\Log;
 
 /**
  * admin用户登录token验证
@@ -55,6 +56,8 @@ class ApiCheckSign
 
 
         $verifySignData=(new SiteAuthService())->verifySign($requestData,$auth["api_secret"]);
+        Log::write('=====云杰000====='.$verifySignData . date('Y-m-d H:i:s', time()));
+        Log::write('=====云杰000====='.$data["DataSign"] . date('Y-m-d H:i:s', time()));
 
 
         if($data["DataSign"]!==$verifySignData){

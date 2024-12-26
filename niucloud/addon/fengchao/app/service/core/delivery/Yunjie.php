@@ -42,6 +42,7 @@ class Yunjie extends BaseDelivery
             'TransportType' => 1,
             'ShipperType' => 5,
             'Weight' => $params['Weight'],
+//            'returnType'=>1,
             'InsureAmount' => $params['InsureAmount'] ?? 0,
             'Receiver' => [
                 'Name' => $params['Receiver']['Name'] ?? '张三',
@@ -83,7 +84,7 @@ class Yunjie extends BaseDelivery
         $item["continuousWeightPrice"] = $resInfo['rateOfStage'];
         $item["continuousWeightAmount"] = $resInfo['rateOfStage'];
         $item["cost"] = $resInfo['totalfee'];
-        $item["isSubsectionContinuousWeightPrice"] = 0;
+        //$item["isSubsectionContinuousWeightPrice"] = 0;
         $item["totalFee"] = $resInfo['discountfee'];
         $item["price"] = [
             "calcFeeType" => '2',
@@ -184,7 +185,7 @@ class Yunjie extends BaseDelivery
         $params = [
             "OrderCode" => $data['order_id'],
         ];
-        $resInfo = $this->execute('1802', $params);
+        $resInfo = $this->execute('1804', $params);
         $resInfo['data'] = $resInfo['ResultCode'];
         $resInfo['msg'] = $resInfo['Reason'];
         if ($resInfo['ResultCode'] == 100) {

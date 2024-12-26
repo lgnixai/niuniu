@@ -27,7 +27,7 @@ class SendNotify
         };
 
         if($result){
-            $fee=(new OrderFee())->where([["order_id","=",$data["FCOrderCode"]],["order_type","=",2]])->findOrEmpty()->toArray();
+            $fee=(new OrderFee())->where([["order_id","=",$data["order_id"]]])->findOrEmpty()->toArray();
 
 
 
@@ -69,8 +69,9 @@ class SendNotify
         $notify["url"]=$api["callback_url"];
 
         Log::write('需要给队列发送的' . json_encode($notify, JSON_UNESCAPED_UNICODE));
-        $res= $this->execute($notify);
+        //$res= $this->execute($notify);
         $res= $this->dev_execute($body);
+
         Log::write('发送给下游客户' . json_encode($res, JSON_UNESCAPED_UNICODE));
 
         $notify["body"]=json_encode($body, JSON_UNESCAPED_UNICODE);
@@ -107,8 +108,8 @@ class SendNotify
     } public function dev_execute($body)
     {
         $timestamp = (string)intval(microtime((bool)1) * 1000);
-         $url="http://127.0.0.1:8888/api/client/callback";
-        $url="http://kd.fengchao100.com:8888/api/fengchao/kdniaonotice";
+         $url="http://0.0.0.0:8080/api/client/callback";
+      //  $url="http://kd.fengchao100.com:8888/api/fengchao/kdniaonotice";
         $header = ["Content-Type: application/json;charset=UTF-8"];
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);

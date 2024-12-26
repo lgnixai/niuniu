@@ -56,7 +56,7 @@ class Client extends BaseApiController
 
         $requestData=($data["RequestData"]);
 
-        //$requestData=json_decode($res["RequestData"],true);
+         $requestData=json_decode($res["RequestData"],true);
         //$AppKey="330aa1fd76054c6c87a5672e6b9db88bbbc4454ba092edf4710518544df97c32";
 
        // $verifySignData=(new SiteAuthService())->encrypt($requestData,$AppKey);

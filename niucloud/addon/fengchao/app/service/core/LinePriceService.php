@@ -78,7 +78,7 @@ class LinePriceService extends BaseApiService
             $t["continuousWeightPrice"] = $v["continuous_weight"];
             $t["continuousWeightAmount"] = $continuous_weight * $v["continuous_weight"];
             $t["cost"] = sprintf("%.2f", $t["firstWeightAmount"] + $t["continuousWeightAmount"]);
-            $t["isSubsectionContinuousWeightPrice"] = 0;
+            //$t["isSubsectionContinuousWeightPrice"] = 0;
             $t["totalFee"] = $t["cost"];
             $t["price"]=[
                 "calcFeeType" => 1,//1:固定运费，2:折扣

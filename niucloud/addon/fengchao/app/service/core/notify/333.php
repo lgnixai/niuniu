@@ -11,13 +11,13 @@ use addon\fengchao\app\model\OrderDeliveryReal;
 use addon\fengchao\app\model\pay\FengChaoPay;
 
 use addon\fengchao\app\service\admin\site\SiteAccountService;
+use addon\fengchao\app\service\core\common\PriceService;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\FengChaoPayService;
 use addon\fengchao\app\service\core\order\OrderService;
 use app\dict\pay\PayDict;
 use app\service\core\notice\NoticeService;
 use core\base\BaseApiService;
-use core\exception\CommonException;
 use think\db\exception\DbException;
 use think\Exception;
 use think\facade\Db;
@@ -27,7 +27,7 @@ use think\Response;
 /**
  * 云杰回调对接
  */
-class YunjieNoticeService extends BaseApiService
+class Yunjie33NoticeService extends BaseApiService
 {
     public function __construct()
     {
@@ -41,7 +41,7 @@ class YunjieNoticeService extends BaseApiService
 
     public function notice($data)
     {
-        Log::write('=====云杰回调信息=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====去杰回调信息=====' . date('Y-m-d H:i:s', time()));
         Log::write($data);
         if ($data['RequestType'] != 103) return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
         $requestData = json_decode($data['RequestData'], true);//请求的DATA
@@ -63,16 +63,16 @@ class YunjieNoticeService extends BaseApiService
      * @param $sign
      * @return void
      * @throws Exception
-     *
+     * 订单状态码
      * 100=下单成功，
-     *  102=分配网点 ，103=分配快递员， 104=已取件，
+     * 102=分配网点 ，103=分配快递员， 104=已取件，
      *
-     *  301=计费，  208=更新重量， 501=已转寄
+     * 301=计费，  208=更新重量， 501=已转寄
      *
-     *  203=取消订单，  204=揽收失败， 205=作废 ，400=下单失败
+     * 203=取消订单，  204=揽收失败， 205=作废 ，400=下单失败
      *
-     *  2=在途中， 3=签收
-     */
+     * 2=在途中， 3=签收
+ */
     public function sub($params, $requestData, $sign)
     {
 
@@ -94,7 +94,6 @@ class YunjieNoticeService extends BaseApiService
         //参数验证完成具体业务封装
         $state = $params['State'];
         Log::write('=====云杰回调进入业务执行====='.$state . date('Y-m-d H:i:s', time()));
-
 
         //订单取消/揽收失败/作废/下单失败
         if ($state == 203 || $state == 204 || $state == 205|| $state == 400 ) $this->closeOrder($order_id, $params);
@@ -119,8 +118,6 @@ class YunjieNoticeService extends BaseApiService
      */
     public function signPackage($order_id, $params)
     {
-        Log::write('=====云杰signPackage====='.json_encode($params) . date('Y-m-d H:i:s', time()));
-
         $orderInfo = $this->orderModel->where(['order_id' => $order_id])->findOrEmpty();
         if ($orderInfo['order_status'] == OrderDict::FINISH) return true;
         $orderInfo->save(['order_status' => OrderDict::FINISH]);
@@ -169,21 +166,19 @@ class YunjieNoticeService extends BaseApiService
             Log::write('=====云杰changeWeight====='.json_encode($deliveryInfo) . date('Y-m-d H:i:s', time()));
 
             if ($deliveryInfo->isEmpty()) {
-                throw new CommonException('物流信息不存在');
+                return Response::create(['msg' => '接受成功', 'code' => 200, 'success' => true], 'json', 200);
             }
-
             $realInfo = $this->deliveryRealModel->where(['order_id' => $deliveryInfo['order_id']])->findOrEmpty();
-            $site=(new SiteAccountService())->getInfo($this->site_id);
-            //折扣类计费规则： OfficialFee*Costing['discount'] + InsureAmount+PackageFee+OtherFee+BackFee
-            //通票类计费规则： Costing['upperGround']*Costing['groundPrice']+ (Weight-Costing['upperGround'])Costing['rateOfStage'] + InsureAmount+PackageFee+OtherFee+BackFee
-
+            $site=(new SiteAccountService())->getInfo($params['site_id']);
+           //折扣类计费规则： OfficialFee*Costing['discount'] + InsureAmount+PackageFee+OtherFee+BackFee
+           //通票类计费规则： Costing['upperGround']*Costing['groundPrice']+ (Weight-Costing['upperGround'])Costing['rateOfStage'] + InsureAmount+PackageFee+OtherFee+BackFee
             $discount=$site['yunjie_discount'];
             $OfficialFee=$params['OfficialFee'] ?? 0;
             //折扣类计费
             $feeBlockList = [];
             if (array_key_exists("discount", $params['Costing'])) {
                 array_push($feeBlockList,[
-                    "fee" => $params['OfficialFee'] * $discount/10,
+                    "fee" => $params['OfficialFee'] * $discount,
                     "type" => '0',
                     "name" => '基础运费'
                 ]);
@@ -195,7 +190,7 @@ class YunjieNoticeService extends BaseApiService
                     "name" => '基础运费'
                 ]);
             }
-            $feeBlockList=array_merge($feeBlockList, [
+            array_push($feeBlockList, [
 
                 [
                     "fee" => $params['PackageFee'] ?? 0,
@@ -223,25 +218,16 @@ class YunjieNoticeService extends BaseApiService
                     "name" => '转寄费'
                 ],
             ]);
-
             $total_fee=0;
             foreach ($feeBlockList as $key => $value) {
                 if (is_array($value)) {
-
-                       $total_fee += $value['fee'];
+                    foreach ($value as $k => $v) {
+                        $total_fee += $v['fee'];
+                    }
                 }
             }
-
-
-
             $total_fee=round($total_fee,2);
-            if($deliveryInfo['total_fee']>=$total_fee){
-                Log::write('已支付金额大于费用'.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
-
-                return ;
-            }
             Log::write('=====云杰changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
-
             $feeWeight = $params['Weight'];
             $realInfo->where(['order_id' => $deliveryInfo['order_id']])->update([
                 'order_id' => $deliveryInfo['order_id'],
@@ -260,33 +246,32 @@ class YunjieNoticeService extends BaseApiService
             if (empty($pay_info))
                 throw new CommonException('支付订单获取失败');
 
-            //需要补差价的处理；
-            if($total_fee-$pay_info["money"]>0){
-                $money=sprintf("%.2f",$total_fee-$pay_info["money"]);
-
-                $pay_data = [
-                    "order_id" => $order_id,
-                    "site_id" => $this->site_id,
-                    "trade_type" =>  3,
-                    "money" => $money,
-                    "status" => PayDict::STATUS_WAIT,
-                ];
-                $this->payModel->save($pay_data);
-
-                $pay_data['pay_id']=$this->payModel->id;
-                $pay_data['memo']="订单补差价";
-
-                event('PayCreate', $pay_data);
-            }
 
 
+
+            $money=sprintf("%.2f",$total_fee-$pay_info["money"]);
+
+
+
+            $pay_data = [
+                "order_id" => $order_id,
+                "site_id" => $this->site_id,
+                "trade_type" =>  3,
+                "money" => $money,
+                "status" => PayDict::STATUS_WAIT,
+            ];
+            $this->payModel->save($pay_data);
+
+            $pay_data['pay_id']=$this->payModel->id;
+            $pay_data['memo']="订单补差价";
+
+            event('PayCreate', $pay_data);
 
             $change_data=[
                 'add_price_status'=>1,
                 'order_id'=>$order_id
             ];
             (new OrderService())->update($change_data);
-
             //修改订单明细
             $odi= (new OrderDelivery())
                 ->where([['order_id', '=', $order_id]])->find( );
@@ -308,6 +293,7 @@ class YunjieNoticeService extends BaseApiService
             throw new CommonException($e->getMessage());
         }
     }
+
 
     /**
      * @Notes:快递员操作揽收包裹  不返回重量

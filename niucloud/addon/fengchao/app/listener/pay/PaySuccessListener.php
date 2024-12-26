@@ -11,6 +11,7 @@
 
 namespace addon\fengchao\app\listener\pay;
 
+use addon\tk_jhkd\app\dict\order\JhkdOrderDict;
 use app\service\core\site\CoreSiteAccountService;
 use think\facade\Log;
 

@@ -93,16 +93,7 @@ class OrderDict
                 'is_refund' => 0,
                 'action' => [],
                 'member_action' => [
-//                    [
-//                        'name' => '立即评价',
-//                        'class' => 'evaluate',
-//                        'params' => ''
-//                    ],
-//                    [
-//                        'name' => '再来一单',
-//                        'class' => 'again',
-//                        'params' => ''
-//                    ],
+
                     [
                         'name' => '删除订单',
                         'class' => 'del',

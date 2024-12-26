@@ -81,7 +81,7 @@ return [
         "DeliveryComplaintOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryComplaintOrderListener'],
         "DeliveryComplaintViewOrder"=>['addon\fengchao\app\listener\order\delivery\DeliveryComplaintViewOrderListener'],
 
-        'JhkdPlatformType' => ['addon\fengchao\app\listener\platform\PlatformListener'],
+        'FCPlatformType' => ['addon\fengchao\app\listener\platform\PlatformListener'],
 
 
 

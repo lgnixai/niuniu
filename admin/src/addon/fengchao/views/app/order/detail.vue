@@ -8,19 +8,19 @@
           <el-col :span="12">
             <el-descriptions title="基本信息" column="1" border>
               <el-descriptions-item label="平台单号">{{ order.OrderId }}</el-descriptions-item>
-              <el-descriptions-item label="客户订单号">{{ order.deliveryInfo.client_order_code }}</el-descriptions-item>
-              <el-descriptions-item label="重量">{{ order.deliveryInfo.order_info.Weight }}</el-descriptions-item>
+              <el-descriptions-item label="客户订单号">{{ order.orderInfo.client_order_code }}</el-descriptions-item>
+              <el-descriptions-item label="重量">{{ order.orderInfo.order_info.Weight }}</el-descriptions-item>
             </el-descriptions>
           </el-col>
 
           <el-col :span="12">
             <el-descriptions title="物流信息" column="1" border>
               <el-descriptions-item label="快递公司">{{
-                  order.deliveryInfo.order_info.ShipperCode
+                  order.orderInfo.order_info.ShipperCode
                 }}
               </el-descriptions-item>
-              <el-descriptions-item label="快递单号">{{ order.deliveryInfo.logistic_order_code }}</el-descriptions-item>
-              <el-descriptions-item label="状态">{{ order.deliveryInfo.order_status_desc }}</el-descriptions-item>
+              <el-descriptions-item label="快递单号">{{ order.orderInfo.delivery_id }}</el-descriptions-item>
+              <el-descriptions-item label="状态">{{ order.order_status_arr.name }}</el-descriptions-item>
 
             </el-descriptions>
           </el-col>
@@ -31,27 +31,27 @@
           <el-col :span="12">
             <el-descriptions title="收货信息" column="1" border>
               <el-descriptions-item label="收货人">{{
-                  order.deliveryInfo.order_info.Receiver.Name
+                  order.orderInfo.order_info.Receiver.Name
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="手机号">{{
-                  order.deliveryInfo.order_info.Receiver.Mobile
+                  order.orderInfo.order_info.Receiver.Mobile
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="省">{{
-                  order.deliveryInfo.order_info.Receiver.ProvinceName
+                  order.orderInfo.order_info.Receiver.ProvinceName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="市">{{
-                  order.deliveryInfo.order_info.Receiver.CityName
+                  order.orderInfo.order_info.Receiver.CityName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="区/县">{{
-                  order.deliveryInfo.order_info.Receiver.ExpAreaName
+                  order.orderInfo.order_info.Receiver.ExpAreaName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="详细地址">{{
-                  order.deliveryInfo.order_info.Receiver.Address
+                  order.orderInfo.order_info.Receiver.Address
                 }}
               </el-descriptions-item>
             </el-descriptions>
@@ -60,27 +60,27 @@
           <el-col :span="12">
             <el-descriptions title="发货信息" column="1" border>
               <el-descriptions-item label="发货人">{{
-                  order.deliveryInfo.order_info.Sender.Name
+                  order.orderInfo.order_info.Sender.Name
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="手机号">{{
-                  order.deliveryInfo.order_info.Sender.Mobile
+                  order.orderInfo.order_info.Sender.Mobile
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="省">{{
-                  order.deliveryInfo.order_info.Sender.ProvinceName
+                  order.orderInfo.order_info.Sender.ProvinceName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="市">{{
-                  order.deliveryInfo.order_info.Sender.CityName
+                  order.orderInfo.order_info.Sender.CityName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="区/县">{{
-                  order.deliveryInfo.order_info.Sender.ExpAreaName
+                  order.orderInfo.order_info.Sender.ExpAreaName
                 }}
               </el-descriptions-item>
               <el-descriptions-item label="详细地址">{{
-                  order.deliveryInfo.order_info.Sender.Address
+                  order.orderInfo.order_info.Sender.Address
                 }}
               </el-descriptions-item>
             </el-descriptions>
@@ -90,15 +90,15 @@
         <el-row :gutter="20" class="section">
           <el-col :span="24">
             <el-descriptions title="商品信息" column="3" border>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+              <el-descriptions-item v-for="(item, index) in order.orderInfo.order_info.Commodity"
                                     :key="`goods-${index}`" label="商品名称">
                 {{ item.GoodsName }}
               </el-descriptions-item>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+              <el-descriptions-item v-for="(item, index) in order.orderInfo.order_info.Commodity"
                                     :key="`quantity-${index}`" label="商品件数">
                 {{ item.GoodsQuantity }}
               </el-descriptions-item>
-              <el-descriptions-item v-for="(item, index) in order.deliveryInfo.order_info.Commodity"
+              <el-descriptions-item v-for="(item, index) in order.orderInfo.order_info.Commodity"
                                     :key="`price-${index}`" label="商品价格">
                 {{ item.GoodsPrice }}
               </el-descriptions-item>
@@ -114,8 +114,8 @@
               <!--              <el-descriptions-item label="首重金额">{{ order.pay_info.first_weight_amount }}</el-descriptions-item>-->
               <!--              <el-descriptions-item label="续重总金额">{{ order.pay_info.continuous_weight_amount }}</el-descriptions-item>-->
               <!--              <el-descriptions-item label="额外费用">{{ order.pay_info.other_fee }}</el-descriptions-item>-->
-              <el-descriptions-item label="计费重量">{{ order.pay_info.weight }}</el-descriptions-item>
-              <el-descriptions-item label="总费用">{{ order.pay_info.total_fee }}</el-descriptions-item>
+              <el-descriptions-item label="计费重量">{{ order.orderFee.weight }}</el-descriptions-item>
+              <el-descriptions-item label="总费用">{{ order.orderFee.total_fee }}</el-descriptions-item>
             </el-descriptions>
           </el-col>
         </el-row>
@@ -139,106 +139,150 @@ import { getOrderDetail } from '@/addon/fengchao/api/order'
 const showDialog = ref(false)
 const loading = ref(false)
 const initialFormData = {
+    order_status_arr: {
+        name: '待支付',
+        status: 0,
+        is_refund: 0,
+        action: [],
+        member_action: [
+            {
+                name: '立即支付',
+                class: 'gopay',
+                params: ''
+            },
+            {
+                name: '关闭订单',
+                class: 'close',
+                params: ''
+            }
+        ]
+    },
     id: 3,
-    site_id: 100008,
-    order_id: '20241216511606390439936',
+    site_id: 100009,
+    member_id: null,
+    order_from: null,
+    order_id: '20241226515129176354816',
     order_money: null,
     order_discount_money: '0.00',
-    order_add_money: '0.00',
+    is_send: '0',
+    is_pick: '0',
     order_status: 0,
-    add_price_status: 1,
     refund_status: 0,
     out_trade_no: null,
+    remark: null,
     pay_time: null,
-    create_time: '2024-12-16 23:31:43',
+    create_time: '2024-12-26 22:25:59',
     close_reason: null,
+    is_enable_refund: null,
     close_time: null,
     ip: '127.0.0.1',
-    update_time: '2024-12-16 23:32:20',
+    update_time: '2024-12-26 22:25:59',
     delete_time: 0,
-    deliveryInfo: {
-        order_id: '20241216511606390439936',
-        line_price_id: 4992,
-        client_order_code: 'f48e1890-6dd2-38b7-8d39-232a17d866e9',
-        service_order_code: 'KDNSIT2412162310000001',
-        logistic_order_code: 'SF1390004911440',
+    send_log: null,
+    orderInfo: {
+        order_id: '20241226515129176354816',
+        site_id: 100009,
+        line_price_id: null,
+        platform: 'yunjie',
+        app_id: '100009323030',
+        client_order_code: 'ea8e38b3-a159-3a9e-a4bf-1f959b1943b5',
+        service_order_code: 'YTZY202412262225594913',
+        delivery_id: 'JDVC27951392612',
+        delivery_status: 1,
+        delivery_type: 'JD',
+        start_date: null,
+        end_date: null,
+        goods: '电子产品',
+        package_count: 1,
+        pickup_info: null,
         order_info: {
-            TransportType: 1,
-            ShipperType: 5,
-            ShipperCode: 'YTO',
-            OrderCode: 'f48e1890-6dd2-38b7-8d39-232a17d866e9',
-            ExpType: 1,
-            PayType: 3,
+            ShipperCode: 'JD',
+            OrderCode: 'ea8e38b3-a159-3a9e-a4bf-1f959b1943b5',
+            ExpType: 'P1',
+            PayType: 2,
             Receiver: {
                 ProvinceName: '广东省',
-                CityName: '佛山市',
-                ExpAreaName: '福田区',
-                Address: '和 Street',
-                Name: '倪子安',
-                Mobile: '11898604843'
+                CityName: '深圳市',
+                ExpAreaName: '南山区',
+                Address: '海德二路茂业时代广场',
+                Name: '戴杨',
+                Mobile: 15603003393
             },
             Sender: {
                 ProvinceName: '河南省',
-                CityName: '郑州市',
-                ExpAreaName: '管城区',
-                Address: '毛 Street',
-                Name: '商智渊',
-                Mobile: '11898604843'
+                CityName: '洛阳市',
+                ExpAreaName: '涧西区',
+                Address: '南昌路丽晶大酒店',
+                Name: '伏洪',
+                Mobile: 15603003392
             },
-            Weight: 0.5,
+            Weight: 3.5,
             Quantity: 1,
             Remark: '',
             Commodity: [
                 {
-                    GoodsName: '食品',
-                    GoodsQuantity: 1,
-                    GoodsPrice: 752.02
+                    GoodsName: '电子产品',
+                    GoodsQuantity: 4,
+                    GoodsPrice: 521.7
                 }
             ],
-            result: {
-                OrderCode: 'f48e1890-6dd2-38b7-8d39-232a17d866e9',
-                KDNOrderCode: 'KDNSIT2412162310000001'
-            }
+            order_id: '20241226515129176354816',
+            platform: 'yunjie'
         },
-        picker_info: [
-            {
-                PersonName: '宋建硕',
-                PersonTel: '18100006672',
-                PickupCode: '1234',
-                PersonCode: ''
-            }
-        ],
         pay_info: null,
         height: null,
-        weight: 2,
-        volume: 19200,
-        volume_weight: 0.5,
-        total_fee: 13,
-        order_status_desc: '订单已分配快递员',
-        order_status: '103',
-        create_time: '2024-12-16 23:31:43',
-        update_time: '2024-12-16 23:40:02',
+        weight: 3.5,
+        volume: null,
+        volume_weight: null,
+        total_fee: null,
+        order_status_desc: null,
+        order_status: '0',
+        create_time: '2024-12-26 22:26:00',
+        update_time: '2024-12-26 22:26:00',
+        delete_time: null,
+        delivery_arry: {
+            name: '圆通速递',
+            logo: 'addon\/fengchao\/logo\/yt.png'
+        }
+    },
+    deliveryRealInfo: {
+        order_id: '20241226515129176354816',
+        weight: 3.5,
+        fee_weight: null,
+        volume: null,
+        package_count: null,
+        fee_blockList: [],
+        total_fee: null,
+        pay_fee: null,
+        create_time: '2024-12-26 22:26:00',
+        update_time: '2024-12-26 22:26:00',
         delete_time: null
     },
-    pay_info: {
-        id: 2,
-        order_id: '20241216511606390439936',
-        order_type: 2,
-        weight: '2.00',
-        first_weight_amount: '5.50',
-        continuous_weight_amount: '6.50',
-        cost: '12.00',
-        insure_amount: '0.00',
-        package_fee: '0.00',
-        over_fee: '0.00',
-        other_fee: '1.00',
-        other_fee_detail: {
-            其他费用: '1.00'
-        },
-        total_fee: '13.00',
-        volume: '19200.00',
-        volume_weight: '0.50'
-    }
+    orderFee: {
+        order_id: '20241226515129176354816',
+        fee_type: 2,
+        weight: '3.50',
+        platform: 'yunjie',
+        official_price: '34.00',
+        discount: '5.30',
+        first_weight: '0.00',
+        first_weight_price: '0.00',
+        first_weight_amount: '0.00',
+        continuous_weight: '0.00',
+        continuous_weight_price: '0.00',
+        continuous_weight_amount: '0.00',
+        cost: null,
+        insure_amount: null,
+        package_fee: null,
+        over_fee: null,
+        back_fee: null,
+        other_fee: null,
+        other_fee_detail: null,
+        total_fee: '18.02',
+        volume: null,
+        volume_weight: null
+    },
+    payInfo: null
 }
 
 const order: Record<string, any> = reactive({ ...initialFormData })

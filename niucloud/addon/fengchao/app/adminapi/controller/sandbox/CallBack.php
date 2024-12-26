@@ -32,8 +32,10 @@ class CallBack extends BaseApiController
     {
 
         $list = [
+
            // '102' => '已经分配网点',
             '103' => '已分配快递员',
+            '100'=>'云杰推送',
             '104' => '推送已取件',
             //'109' => '更换快递公司',
 //            '110' => '修改预约时间',
@@ -104,6 +106,53 @@ class CallBack extends BaseApiController
                     "FetchTime" => "",
                     "KDNOrderCode" => "KDNIST2310101000000001",
                     "OperateType" => 2
+                ]
+            ],
+            "Count" => 1
+        ];
+
+        // 返回 JSON 数据
+        return success($data);
+    }
+    public function Fake_100($site_id)
+    {
+
+        $data = [
+
+            "PushTime"=>"2023-10-10 18:13:23",
+            "EBusinessID"=> "350238",
+            "Data" => [
+                [
+                    "EBusinessID" => "350238",
+                    "PlatCode" => "XD202208281136338903",
+                    "LogisticCode" => "73100039470370",
+                    "State" => "208",
+                    "Reason" => "下单成功",
+                    "ShipperCode" => "ZT",
+                    "CreateTime" => "2022-08-28 11:36:33",
+                    "OrderCode" => "b9a450e5-207f-34ea-a0fe-91ffbaedda0a",
+                    "OperateType" => 2,
+                    "PickerInfo" => [
+                        [
+                            "StationName" => "XXX",
+                            "StationTel" => "XXX",
+                            "PersonName" => "XXX",
+                            "PersonTel" => "15511296730",
+                            "PickupCode" => "1988",
+                            "PersonCode" => "00854695"
+                        ]
+                    ],
+                    "OfficialFee"=>15,
+                    "chargedWeight"=>2,
+                    "Weight" => 1,
+                    "Volume" => 0,
+                    "Cost" => 10,
+                    "InsureAmount" => 1,
+                    "PackageFee" => 1,
+                    "OtherFee" => 0,
+                    "Costing"=>[
+                        "discount"=>6,
+                    ]
                 ]
             ],
             "Count" => 1

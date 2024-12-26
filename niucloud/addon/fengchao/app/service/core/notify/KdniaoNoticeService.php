@@ -13,8 +13,10 @@ use addon\fengchao\app\model\pay\FengChaoPay;
 use addon\fengchao\app\service\core\CommonService;
 use addon\fengchao\app\service\core\FengChaoPayService;
 use addon\fengchao\app\service\core\order\OrderService;
+use app\dict\pay\PayDict;
 use app\service\core\notice\NoticeService;
 use core\base\BaseApiService;
+use core\exception\CommonException;
 use think\db\exception\DbException;
 use think\Exception;
 use think\facade\Db;
@@ -22,7 +24,7 @@ use think\facade\Log;
 use think\Response;
 
 /**
- * 快递鸟回掉对接
+ * 快递鸟回调对接
  */
 class KdniaoNoticeService extends BaseApiService
 {
@@ -38,7 +40,7 @@ class KdniaoNoticeService extends BaseApiService
 
     public function notice($data)
     {
-        Log::write('=====快递鸟回掉信息=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟回调信息=====' . date('Y-m-d H:i:s', time()));
         Log::write($data);
         if ($data['RequestType'] != 103) return Response::create(['EBusinessID' => $data['RequestData']['EBusinessID'] ?? '100000', 'UpdateTime' => date('Y-m-d H:i:s', time()), 'Success' => true]);
         $requestData = json_decode($data['RequestData'], true);//请求的DATA
@@ -57,16 +59,15 @@ class KdniaoNoticeService extends BaseApiService
     public function sub($params, $requestData, $sign)
     {
 
-        Log::write('=====快递鸟000=====' . date('Y-m-d H:i:s', time()));
 
         $order_id = $params['OrderCode'];
         $order_s = $this->orderModel->where(['order_id' => $order_id])->findOrEmpty();
-        Log::write('=====快递鸟000====='.json_encode($order_s) . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟订单信息====='.json_encode($order_s) . date('Y-m-d H:i:s', time()));
 
         if ($order_s->isEmpty()) return;
         $order_info = $this->deliveryModel->where(['order_id' => $order_id])->findOrEmpty();
 
-        Log::write('=====快递鸟111=====' . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟物流单====='.json_encode($order_info)  . date('Y-m-d H:i:s', time()));
 
         if ($order_info->isEmpty()) return;
         $config = (new CommonService())->getSiteDriver('kdniao')['params'];
@@ -74,7 +75,7 @@ class KdniaoNoticeService extends BaseApiService
         //if ($this->encrypt($requestData, $config['api_key']) != $sign) return;
         //参数验证完成具体业务封装
         $state = $params['State'];
-        Log::write('=====快递鸟回调进入业务执行====='.$state . date('Y-m-d H:i:s', time()));
+        Log::write('=====快递鸟回调进入业务执行====='.json_encode($params) . date('Y-m-d H:i:s', time()));
 
         //订单调度失败/取消推送/虚假揽件 进行订单取消
         if ($state == 99 || $state == 203 || $state == 206) $this->closeOrder($order_id, $params);
@@ -182,14 +183,17 @@ class KdniaoNoticeService extends BaseApiService
             $total_fee=0;
             foreach ($feeBlockList as $key => $value) {
                 if (is_array($value)) {
-                    foreach ($value as $k => $v) {
-                        $total_fee += $v['fee'];
-                    }
+
+                        $total_fee += $value['fee'];
+
                 }
             }
             $total_fee=round($total_fee,2);
 
             Log::write('=====快递鸟changeWeight====='.json_encode($feeBlockList) . date('Y-m-d H:i:s', time()));
+
+            Log::write('=====快递鸟changeWeight====='.json_encode($params) . date('Y-m-d H:i:s', time()));
+
             $feeWeight = $params['Weight'];
             $realInfo->where(['order_id' => $deliveryInfo['order_id']])->update([
                 'order_id' => $deliveryInfo['order_id'],
@@ -243,7 +247,7 @@ class KdniaoNoticeService extends BaseApiService
             $odi->weight=$params["Weight"];
             $odi->total_fee=$total_fee;
             $odi->volume=$params["Volume"];
-            $odi->volume_weight=$params["chargedWeight"];
+            $odi->volume_weight=$params["VolumeWeight"];
             $odi->update_time=time();
             $odi->save($odi);
 

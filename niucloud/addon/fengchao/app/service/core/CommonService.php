@@ -131,7 +131,7 @@ class CommonService extends BaseAdminService
      */
     public function getDriverByType($type)
     {
-        $platform_type_list = event('JhkdPlatformType')[0];
+        $platform_type_list = event('FCPlatformType')[0];
         $flattened_list = array_merge(...$platform_type_list);
         foreach ($flattened_list as $k => $item) {
             if ($item['type'] == $type) {

@@ -39,7 +39,7 @@ class FakeData extends BaseApiController
             '1807' => '工单提交接口',
             '1815' => '预估运费接口',
 
-            '1816' => '订单状态查询接口',
+            //'1816' => '订单状态查询接口',
             '1818' => '工单详情查询接口',
 
         ];
@@ -343,7 +343,7 @@ class FakeData extends BaseApiController
         if (empty($orders)) {
 
         } else {
-            $order_code = $orders[array_rand($orders)]['response_data']["Order"]['KDNOrderCode'];
+            $order_code = $orders[array_rand($orders)]['request_data']["OrderCode"];
         }
         // 构造假数据
         $data = [

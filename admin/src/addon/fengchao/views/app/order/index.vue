@@ -47,14 +47,27 @@
               </el-tooltip>
             </template>
           </el-table-column>
+          <!--          <el-table-column prop="order_code" fixed label="下单时间" min-width="165" style="width: 100%">-->
+          <!--            <template #default="{ row }">-->
+          <!--              <el-tooltip-->
+          <!--                  class="item"-->
+          <!--                  effect="dark"-->
+          <!--                  :content="row.create_time"-->
+          <!--                  placement="top"-->
+          <!--              >-->
+          <!--                <span> {{ (row.create_time) }}</span>-->
+          <!--              </el-tooltip>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <el-table-column prop="create_time" label="下单时间" min-width="165"/>
 
-          <el-table-column prop="client_order_code" label="商家订单号" min-width="200"/>
-          <el-table-column prop="logistic_order_code" label="运单号" min-width="200"/>
-          <el-table-column prop="order_info.Sender.ProvinceName" label="发件省" min-width="120"/>
-          <el-table-column prop="order_info.Sender.Name" label="发件人" min-width="120"/>
-          <el-table-column prop="order_info.Receiver.ProvinceName" label="收件省" min-width="120"/>
-          <el-table-column prop="order_info.Receiver.Name" label="收件人" min-width="120"/>
-          <el-table-column prop="order_info.ShipperCode" label="物流公司" min-width="120"/>
+          <el-table-column prop="orderInfo.client_order_code" label="商家订单号" min-width="260"/>
+          <el-table-column prop="orderInfo.delivery_id" label="运单号" min-width="200"/>
+          <el-table-column prop="orderInfo.order_info.Sender.ProvinceName" label="发件省" min-width="120"/>
+          <el-table-column prop="orderInfo.order_info.Sender.Name" label="发件人" min-width="120"/>
+          <el-table-column prop="orderInfo.order_info.Receiver.ProvinceName" label="收件省" min-width="120"/>
+          <el-table-column prop="orderInfo.order_info.Receiver.Name" label="收件人" min-width="120"/>
+          <el-table-column prop="orderInfo.order_info.ShipperCode" label="物流公司" min-width="120"/>
 
           <el-table-column :label="t('operation')" fixed="right" align="right" min-width="120">
             <template #default="{ row }">
